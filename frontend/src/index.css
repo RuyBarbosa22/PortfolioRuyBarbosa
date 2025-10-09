@@ -1,0 +1,168 @@
+/* src/index.css */
+
+@import "tailwindcss";
+
+@theme {
+  /* Fontes personalizadas */
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-roboto-mono: "Roboto Mono", monospace;
+  --color-primary: #7D44FF;
+  --color-primary-light: #9d6fff;
+  --color-primary-lighter: #a78bfa;
+  
+  --animate-slide-in: slideIn 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(-1px) scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-2px) scale(1.05);
+  }
+  100% {
+    transform: translateY(-1px) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* index.css (ou globals.css) */
+
+/* keyframes para a animação do gradiente */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes wingFlap {
+  0%, 100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(1.05);
+  }
+}
+
+@keyframes wingFlapActive {
+  0%, 100% {
+    transform: scaleX(1) scaleY(1);
+  }
+  25% {
+    transform: scaleX(1.15) scaleY(0.95);
+  }
+  50% {
+    transform: scaleX(0.9) scaleY(1.05);
+  }
+  75% {
+    transform: scaleX(1.15) scaleY(0.95);
+  }
+}
+
+/* Animação de batida da asa esquerda - invertida para sincronizar com float */
+@keyframes wingBeatLeft {
+  0% {
+    transform: translateY(20px) rotate(20deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(-15deg);
+  }
+  100% {
+    transform: translateY(20px) rotate(20deg);
+  }
+}
+
+/* Animação de batida da asa direita - invertida para sincronizar com float */
+@keyframes wingBeatRight {
+  0% {
+    transform: translateY(20px) rotate(-20deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(15deg);
+  }
+  100% {
+    transform: translateY(20px) rotate(-20deg);
+  }
+}
+
+/* Animação do indicador de scroll */
+@keyframes scrollBounce {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(10px);
+    opacity: 0.6;
+  }
+}
+
+/* Animação dos Zs flutuando quando Menebot está dormindo */
+@keyframes floatZ {
+  0% {
+    transform: translateY(0px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+}
+
+/* span que recebe o texto animado — base */
+.typewriter-word {
+  display: inline-block;           /* inline-block funciona melhor com background-clip:text */
+  line-height: inherit;
+  vertical-align: middle;          /* centraliza verticalmente com o texto ao redor */
+  padding: 0;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-position: 0 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent; /* importante */
+  color: transparent;                    /* fallback */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* gradiente roxo fixo (igual ao "Ruy") */
+.typewriter-word.purple {
+  background-image: radial-gradient(circle, #E204F5 0%, #CC12F7 22%, #B321FA 46%, #9733FC 74%, #7D44FF 100%);
+  background-size: auto;
+  animation: none;
+}
+
+/* gradiente animado para Fullstack (aplica apenas quando a palavra estiver completa) */
+.typewriter-word.fullstack {
+  background-image: linear-gradient(90deg, #E204F5 0%, #7D44FF 20%, #00D4FF 40%, #0099FF 60%, #7D44FF 80%, #E204F5 100%);
+  background-size: 200% 100%;
+  animation: gradient-shift 3s linear infinite;
+}
+
