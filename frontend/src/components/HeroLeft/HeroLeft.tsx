@@ -25,7 +25,7 @@ export const HeroLeft: React.FC<HeroLeftProps> = ({ onPrimaryClick, language = '
   return (
     <div className="text-center lg:text-left flex flex-col xl:flex-1 max-w-[800px] md:items-center lg:items-start xl:justify-center xl:pr-8">
       <div className="w-full flex flex-col items-center lg:items-start mt-8 md:mt-0">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-[var(--font-montserrat)] leading-[1.4] pb-2 overflow-visible text-center lg:text-left">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-[var(--font-montserrat)] leading-[1.4] pb-2 overflow-visible text-center lg:text-left sm:whitespace-nowrap">
           {greetingByLang[language]}{' '}
           <span
             className="bg-gradient-radial from-[#E204F5] via-[#CC12F7] to-[#7D44FF] bg-clip-text text-transparent"
@@ -84,12 +84,12 @@ export const HeroLeft: React.FC<HeroLeftProps> = ({ onPrimaryClick, language = '
         )}
       </p>
 
-      <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center lg:justify-start mb-0 md:mb-0">
-        <button onClick={onPrimaryClick} className="w-auto min-w-[200px] px-6 md:px-8 py-3 sm:py-3.5 bg-[var(--color-primary)] text-white font-[var(--font-montserrat)] font-semibold text-sm sm:text-base rounded-full hover:bg-[var(--color-primary-light)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.6)] transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap mx-auto lg:mx-0">
+      <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-0 md:mb-0">
+        <button onClick={onPrimaryClick} className="w-auto min-w-[200px] px-6 md:px-8 py-3 sm:py-3.5 bg-[var(--color-primary)] text-white font-[var(--font-montserrat)] font-semibold text-sm sm:text-base rounded-full hover:bg-[var(--color-primary-light)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.6)] transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap mx-auto sm:mx-0 lg:mx-0">
           {ctaPrimary}
         </button>
 
-        <button className="w-auto min-w-[200px] px-6 md:px-8 py-3 sm:py-3.5 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-[var(--font-montserrat)] font-semibold text-sm sm:text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap mx-auto lg:mx-0">
+        <button className="w-auto min-w-[200px] px-6 md:px-8 py-3 sm:py-3.5 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-[var(--font-montserrat)] font-semibold text-sm sm:text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap mx-auto sm:mx-0 lg:mx-0">
           {ctaDownload}
           <svg
             xmlns="http://www.w3.org/2000/svg"

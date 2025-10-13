@@ -99,7 +99,7 @@ function App() {
       />
 
       {/* Hero Section */}
-      <main className="min-h-screen pt-24 md:pt-32 lg:pt-64 pb-20 md:pb-32 relative z-10 flex flex-col" onClick={handleClickOutside}>
+      <main className="min-h-screen pt-40 md:pt-32 lg:pt-64 pb-20 md:pb-32 relative z-10 flex flex-col" onClick={handleClickOutside}>
         <div className="md:px-8 lg:px-12 xl:px-12 max-w-[1600px] mx-auto w-full flex-1 flex flex-col">
           {/* Container Left & Right - Desktop >=1280px */}
           <div className='xl:w-full xl:justify-start'>
@@ -108,19 +108,20 @@ function App() {
             {/* LEFT - Conteúdo Textual e Botões (componentizado) */}
             <HeroLeft language={currentLanguage} onPrimaryClick={() => { setIsTalkBoxVisible(true); setCurrentMessageIndex(0); }} />
 
-            {/* Indicador de scroll - mobile/tablet - após conteúdo, antes do Menebot em mobile */}
-            <div className="xl:hidden flex flex-col items-center gap-3 mt-auto mb-12 pt-8 md:pt-16">
-              <img 
-                src={scrollMouseIcon}
-                alt="Scroll para baixo"
-                className="w-[26px] h-[44px] sm:w-[30px] sm:h-[50px]"
-                style={{
-                  animation: 'scrollBounce 2s ease-in-out infinite',
-                  filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
-                }}
-              />
-              <span 
-                  className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider"
+  {/* container scrollDown */}
+  <div className="md:hidden w-full flex flex-col items-center gap-3 si-responsive-mt mb-20 z-0 pointer-events-auto bg-green-200">
+              <div className="flex flex-col items-center justify-center">
+                <img
+                  src={scrollMouseIcon}
+                  alt="Scroll para baixo"
+                  className="w-[26px] h-[44px] sm:w-[30px] sm:h-[50px]"
+                  style={{
+                    animation: 'scrollBounce 2s ease-in-out infinite',
+                    filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.25))'
+                  }}
+                />
+                <span
+                  className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider mt-1"
                   style={{
                     animation: 'scrollBounce 2s ease-in-out infinite',
                     animationDelay: '0.1s'
@@ -128,6 +129,58 @@ function App() {
                 >
                   {translations[currentLanguage].scroll}
                 </span>
+              </div>
+            </div>
+
+            {/* Indicador de scroll - largescreens between 1024px and 1280px (lg only)
+                Em-fluxo (não absoluto), colocado antes do Menebot para garantir que o Menebot
+                fique abaixo e que exista espaçamento considerável entre os botões e o indicador. */}
+            <div className="hidden lg:flex xl:hidden w-full flex-col items-center gap-3 mt-12 mb-4 z-0 pointer-events-auto">
+              <div className="flex flex-col items-center justify-center">
+                <img
+                  src={scrollMouseIcon}
+                  alt="Scroll para baixo"
+                  className="w-[28px] h-[48px] lg:w-[30px] lg:h-[50px]"
+                  style={{
+                    animation: 'scrollBounce 2s ease-in-out infinite',
+                    filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.25))'
+                  }}
+                />
+                <span
+                  className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider mt-1"
+                  style={{
+                    animation: 'scrollBounce 2s ease-in-out infinite',
+                    animationDelay: '0.1s'
+                  }}
+                >
+                  {translations[currentLanguage].scroll}
+                </span>
+              </div>
+            </div>
+
+            {/* Indicador de scroll - tablet/medium screens (>=768px and <1024px)
+                Visível apenas neste intervalo para manter a ordem: buttons -> scroll -> menebot */}
+            <div className="hidden md:flex lg:hidden w-full flex-col items-center gap-3 md:mt-[35px] mb-6 z-0 pointer-events-auto">
+              <div className="flex flex-col items-center justify-center">
+                <img
+                  src={scrollMouseIcon}
+                  alt="Scroll para baixo"
+                  className="w-[28px] h-[48px] lg:w-[30px] lg:h-[50px]"
+                  style={{
+                    animation: 'scrollBounce 2s ease-in-out infinite',
+                    filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.25))'
+                  }}
+                />
+                <span
+                  className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider mt-1"
+                  style={{
+                    animation: 'scrollBounce 2s ease-in-out infinite',
+                    animationDelay: '0.1s'
+                  }}
+                >
+                  {translations[currentLanguage].scroll}
+                </span>
+              </div>
             </div>
 
             {/* Menebot - Centralizado em mobile (<1280px), Lateral direita em desktop (>=1280px) */}

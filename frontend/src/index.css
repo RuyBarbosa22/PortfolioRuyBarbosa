@@ -166,3 +166,20 @@
   animation: gradient-shift 3s linear infinite;
 }
 
+/* Custom responsive utility for the scroll indicator margin-top
+   - default (321px - 767px): use mt-60
+   - small (<=320px): use mt-40
+   This utility is applied only where needed via the class `si-responsive-mt`. */
+@layer utilities {
+  .si-responsive-mt {
+    margin-top: 15rem; /* Tailwind mt-60 */
+  }
+}
+
+/* Override for very small screens (<=320px) */
+@media (max-width: 320px) {
+  .si-responsive-mt {
+    margin-top: 10rem; /* Tailwind mt-40 */
+  }
+}
+

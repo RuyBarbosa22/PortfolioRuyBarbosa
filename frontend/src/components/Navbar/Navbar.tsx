@@ -30,6 +30,24 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Keep "first" nav item selected when language changes while we're at the top
+  useEffect(() => {
+    // Build array of first/nav0 labels across all languages
+    const firstLabels: string[] = Object.keys(translations).map((k) => translations[k].nav[0]);
+    const newFirst = translations[selectedLanguage].nav[0];
+
+    const topThreshold = 120; // px from top considered "first section"
+    if (window.scrollY <= topThreshold) {
+      setActiveLink(newFirst);
+      return;
+    }
+
+    // If current active link is any language's first label, update it to the new language label
+    if (firstLabels.includes(activeLink)) {
+      setActiveLink(newFirst);
+    }
+  }, [selectedLanguage, activeLink]);
+
   return (
     <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
       isScrolled ? 'bg-black/60 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.5)]' : ''
@@ -116,7 +134,6 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
                 ref={languageToggleRef}
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log('🔄 Toggle mobile - Estado atual:', isLanguageOpen, '→ Novo:', !isLanguageOpen);
                   setIsLanguageOpen(!isLanguageOpen);
                 }}
                 aria-label="Toggle language selector"
@@ -132,12 +149,10 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
                   isOpen={isLanguageOpen}
                   selectedLanguage={selectedLanguage}
                   onLanguageChange={(lang) => {
-                    console.log('📱 Mobile: Mudando idioma para', lang);
                     onLanguageChange(lang as 'pt'|'en'|'es');
                     setIsLanguageOpen(false); // Fecha após selecionar
                   }}
                   onClose={() => {
-                    console.log('📱 Mobile: Fechando dropdown');
                     setIsLanguageOpen(false);
                   }}
                 />
@@ -197,7 +212,6 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
               ref={languageToggleRef}
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('🔄 Toggle desktop - Estado atual:', isLanguageOpen, '→ Novo:', !isLanguageOpen);
                 setIsLanguageOpen(!isLanguageOpen);
               }}
               aria-label="Toggle language selector"
@@ -213,12 +227,10 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
             isOpen={isLanguageOpen}
             selectedLanguage={selectedLanguage}
             onLanguageChange={(lang) => {
-              console.log('🖥️ Desktop: Mudando idioma para', lang);
               onLanguageChange(lang as 'pt'|'en'|'es');
               setIsLanguageOpen(false); // Fecha após selecionar
             }}
             onClose={() => {
-              console.log('🖥️ Desktop: Fechando dropdown');
               setIsLanguageOpen(false);
             }}
           />

@@ -31,14 +31,7 @@ export function LanguageSwitch({ isOpen, selectedLanguage, onLanguageChange, onC
       const clickedInsideDropdown = dropdownRef.current && dropdownRef.current.contains(target);
       const clickedOnAnchor = anchorRef?.current && anchorRef.current.contains(target);
 
-      console.log('🔍 Click detectado:', {
-        clickedInsideDropdown,
-        clickedOnAnchor,
-        target: (target as HTMLElement).tagName
-      });
-
       if (!clickedInsideDropdown && !clickedOnAnchor) {
-        console.log('❌ Fechando dropdown (click outside)');
         onClose();
       }
     };
@@ -72,7 +65,6 @@ export function LanguageSwitch({ isOpen, selectedLanguage, onLanguageChange, onC
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            console.log('🌍 Idioma selecionado:', lang.code);
             onLanguageChange(lang.code);
           }}
           className={`
