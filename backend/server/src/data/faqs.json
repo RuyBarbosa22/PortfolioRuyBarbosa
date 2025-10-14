@@ -1,0 +1,106 @@
+[
+  {
+    "id": "summary",
+    "intent": "who_is_ruy",
+    "keywords": ["quem é", "perfil", "resumo", "sobre você", "who are you", "about yourself", "quién eres", "sobre ti"],
+    "answer_pt": "Sou Ruy Barbosa, desenvolvedor fullstack com foco em backend (Node.js) e experiência em AWS, SecOps e automação de scripts. Busco atuar como Backend Engineer ou Fullstack Developer em projetos em nuvem e automação.",
+    "answer_en": "I'm Ruy Barbosa, a fullstack developer focused on backend (Node.js) with experience in AWS, SecOps and scripting automation. I aim to work as a Backend Engineer or Fullstack Developer on cloud and automation projects.",
+    "answer_es": "Soy Ruy Barbosa, desarrollador fullstack con enfoque en backend (Node.js) y experiencia en AWS, SecOps y automatización con scripts. Mi objetivo es trabajar como Backend Engineer o Fullstack Developer en proyectos cloud y de automatización."
+  },
+  {
+    "id": "main_focus",
+    "intent": "what_is_focus",
+    "keywords": ["foco", "especialidade", "área", "especialização", "main focus", "specialize", "foco profesional", "especializas"],
+    "answer_pt": "Meu foco é desenvolvimento backend com Node.js e soluções em AWS; trabalho também como fullstack quando necessário, com interesse em automação e escalabilidade.",
+    "answer_en": "My focus is backend development with Node.js and AWS solutions; I also work as fullstack when needed, with an interest in automation and scalability.",
+    "answer_es": "Mi foco es el desarrollo backend con Node.js y soluciones en AWS; también trabajo como fullstack cuando es necesario, con interés en automatización y escalabilidad."
+  },
+  {
+    "id": "tech_stack",
+    "intent": "technologies",
+    "keywords": ["tecnologias", "stack", "ferramentas", "skills", "technologies", "technical skills", "tecnologías", "habilidades técnicas"],
+    "answer_pt": "Principais tecnologias: Node.js, JavaScript/TypeScript, Kotlin, Spring Boot, JPA, API REST, MySQL, Tailwind/CSS, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); também uso Python em automações e Power BI para dashboards.",
+    "answer_en": "Key technologies: Node.js, JavaScript/TypeScript, Kotlin, Spring Boot, JPA, REST APIs, MySQL, Tailwind/CSS, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); I also use Python for automation and Power BI for dashboards.",
+    "answer_es": "Tecnologías clave: Node.js, JavaScript/TypeScript, Kotlin, Spring Boot, JPA, APIs REST, MySQL, Tailwind/CSS, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); también uso Python para automatizaciones y Power BI para dashboards."
+  },
+  {
+    "id": "current_job",
+    "intent": "current_employer",
+    "keywords": ["onde trabalha", "empresa atual", "trabalha em", "currently work", "company", "dónde trabajas", "empresa"],
+    "answer_pt": "Atualmente trabalho na Accenture como desenvolvedor backend. (Detalhes operacionais e nomes de clientes não devem ser divulgados.)",
+    "answer_en": "I currently work at Accenture as a backend developer. (Operational details and client names should not be disclosed.)",
+    "answer_es": "Actualmente trabajo en Accenture como desarrollador backend. (No deben divulgarse detalles operativos ni nombres de clientes.)"
+  },
+  {
+    "id": "project_tv",
+    "intent": "describe_tv_project",
+    "keywords": ["tv", "assinatura", "prime", "subscription", "amazon prime", "tv por suscripción"],
+    "answer_pt": "Desenvolvi o fluxo de assinatura do pacote Amazon Prime usando Node.js e MongoDB, integrei componentes de infraestrutura na AWS (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk) e utilizei Datadog para monitoramento. Participei do ciclo completo: integração, testes e deploy em produção.",
+    "answer_en": "I developed the Amazon Prime subscription flow using Node.js and MongoDB, integrated AWS infrastructure components (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk), and used Datadog for monitoring. I participated across integration, testing and production deployment.",
+    "answer_es": "Desarrollé el flujo de suscripción de Amazon Prime usando Node.js y MongoDB, integré componentes de infraestructura AWS (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk) y usé Datadog para monitorización. Participé en integración, pruebas y despliegue en producción."
+  },
+  {
+    "id": "project_multinational",
+    "intent": "describe_multinational_project",
+    "keywords": ["multinacional", "oracle mobile", "sustentação", "multinational", "telecom", "proyecto multinacional"],
+    "answer_pt": "Atuo como backend developer implementando novas features e corrigindo bugs em serviços Node.js; faço manutenção da infraestrutura Oracle Mobile Hub e trabalho com Jira, Confluence, Bitbucket e pipelines de CI/CD para garantir estabilidade e evolução contínua.",
+    "answer_en": "I work as a backend developer implementing new features and fixing bugs in Node.js services; I maintain Oracle Mobile Hub infrastructure and use Jira, Confluence, Bitbucket and CI/CD pipelines to ensure stability and ongoing evolution.",
+    "answer_es": "Trabajo como backend developer implementando nuevas funcionalidades y corrigiendo bugs en servicios Node.js; mantengo la infraestructura Oracle Mobile Hub y uso Jira, Confluence, Bitbucket y pipelines CI/CD para asegurar estabilidad y evolución continua."
+  },
+  {
+    "id": "fraud_detection",
+    "intent": "fraud_detection_automation",
+    "keywords": ["fraude", "detecção", "automação", "scripts", "fraud detection", "automation", "detección de fraudes"],
+    "answer_pt": "Implementei scripts em Python (pandas) que cruzaram dados via APIs (TIM e fornecedores terceirizados) para identificar inconsistências em datas de instalação de fibra. A solução gerou relatórios CSV automatizados e levou à investigação interna sobre discrepâncias entre empresa e terceirizada.",
+    "answer_en": "I implemented Python (pandas) scripts that cross-checked data via APIs (TIM and third-party providers) to identify inconsistencies in fiber installation dates. The solution produced automated CSV reports and led to internal investigation into discrepancies between the company and subcontractors.",
+    "answer_es": "Implementé scripts en Python (pandas) que cruzaron datos a través de APIs (TIM y proveedores terceros) para identificar inconsistencias en fechas de instalación de fibra. La solución generó informes CSV automatizados y provocó una investigación interna sobre discrepancias entre la empresa y la subcontrata."
+  },
+  {
+    "id": "secops_role",
+    "intent": "secops_role_details",
+    "keywords": ["secops", "ticket manager", "segurança", "slas", "power bi", "security", "ticket", "gestor"],
+    "answer_pt": "Na SecOps fui responsável pela gestão e triagem de chamados, garantindo cumprimento de SLAs e atendimento de incidentes críticos. Atuei como tradutor técnico em reuniões internacionais e desenvolvi dashboards em Power BI para análise operacional.",
+    "answer_en": "In SecOps I managed and triaged tickets, ensuring SLA compliance and handling critical incidents. I acted as a technical translator in international meetings and developed Power BI dashboards for operational analysis.",
+    "answer_es": "En SecOps fui responsable de gestionar y clasificar tickets, asegurando el cumplimiento de SLAs y la atención de incidentes críticos. Actué como traductor técnico en reuniones internacionales y desarrollé dashboards en Power BI para análisis operativo."
+  },
+  {
+    "id": "work_style",
+    "intent": "work_style_and_feedback",
+    "keywords": ["como trabalha", "estilo de trabalho", "feedback", "cnv", "comunicação", "work style", "communication", "estilo de trabajo"],
+    "answer_pt": "Sou persistente e foco em entregar qualidade; prefiro feedback direto e objetivo (1:1 ou comentários em PR). Em conflitos técnicos aplico inteligência emocional e Comunicação Não-Violenta, buscando mediar e alinhar soluções práticas.",
+    "answer_en": "I'm persistent and focused on delivering quality; I prefer direct, objective feedback (1:1 or PR comments). In technical conflicts I use emotional intelligence and Nonviolent Communication, aiming to mediate and align practical solutions.",
+    "answer_es": "Soy persistente y me enfoco en entregar calidad; prefiero retroalimentación directa y objetiva (1:1 o comentarios en PR). En conflictos técnicos uso inteligencia emocional y Comunicación No Violenta para mediar y alinear soluciones prácticas."
+  },
+  {
+    "id": "pressure_and_deadlines",
+    "intent": "pressure_and_deadlines",
+    "keywords": ["prazos", "pressão", "bloqueios", "deadlines", "entregar", "pressure", "tight deadlines", "presión"],
+    "answer_pt": "Busco entregar o máximo possível, comunico bloqueios precocemente e peço suporte quando necessário; reporto progresso com frequência para garantir que estou no caminho certo.",
+    "answer_en": "I aim to deliver as much as possible, communicate blockers early and request support when needed; I report progress frequently to ensure alignment.",
+    "answer_es": "Procuro entregar lo máximo posible, comunico bloqueos temprano y solicito apoyo cuando es necesario; reporto progreso con frecuencia para asegurar alineamiento."
+  },
+  {
+    "id": "availability_and_work_pref",
+    "intent": "availability_and_work_preferences",
+    "keywords": ["disponibilidade", "aviso prévio", "remoto", "modalidade", "salário", "availability", "remote", "salary", "disponibilidad", "sueldo"],
+    "answer_pt": "Disponibilidade: aviso prévio mínimo de 2 semanas. Preferência: remoto, mas disponível para híbrido/presencial. Sobre pretensão salarial: prefiro discutir diretamente com o recrutador.",
+    "answer_en": "Availability: minimum 2 weeks' notice. Preference: remote, but available for hybrid/presential. Salary expectation: I prefer to discuss directly with the recruiter.",
+    "answer_es": "Disponibilidad: aviso previo mínimo de 2 semanas. Preferencia: remoto, pero disponible para híbrido/presencial. Expectativa salarial: prefiero discutirla directamente con el reclutador."
+  },
+  {
+    "id": "how_is_working_with_ruy",
+    "intent": "how_is_working_with_person",
+    "keywords": ["como é trabalhar com", "perfil humano", "personalidade", "colegas", "working with you", "colleagues", "trabajar contigo", "compañeros"],
+    "answer_pt": "Sou colaborativo, comunicativo e persistente: busco resolver antes de pedir ajuda, apresento ideias com clareza e valorizo alinhamentos regulares. Gosto de contribuir tecnicamente e apoiar o time com soluções práticas.",
+    "answer_en": "I'm collaborative, communicative and persistent: I try to resolve issues before asking for help, present ideas clearly and value regular alignments. I like to contribute technically and support the team with practical solutions.",
+    "answer_es": "Soy colaborativo, comunicativo y persistente: intento resolver antes de pedir ayuda, presento ideas con claridad y valoro los alineamientos regulares. Me gusta contribuir técnicamente y apoyar al equipo con soluciones prácticas."
+  },
+  {
+    "id": "personal_curiosities",
+    "intent": "personal_curiosities",
+    "keywords": ["curiosidades", "hobbies", "gosta de", "comida", "hobby", "food", "favorite", "curiosidad", "pasatiempo"],
+    "answer_pt": "Gosto de jogar jogos digitais e viajar. Comida preferida: hambúrguer. Prato favorito: Fettuccine ao molho pesto com camarão. Essas informações são curiosidades e devem ser compartilhadas apenas quando apropriado.",
+    "answer_en": "I enjoy playing digital games and traveling. Favorite food: hamburger. Favorite dish: Fettuccine with pesto sauce and shrimp. These are curiosities and should be shared only when appropriate.",
+    "answer_es": "Me gusta jugar videojuegos y viajar. Comida preferida: hamburguesa. Plato favorito: Fettuccine con salsa pesto y camarones. Estas son curiosidades y deben compartirse solo cuando sea apropiado."
+  }
+]

@@ -38,6 +38,8 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   const [isValidated, setIsValidated] = useState(false);
   const [showCheckAnimation, setShowCheckAnimation] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [savedEmail, setSavedEmail] = useState(''); // Email salvo para o chat
 
   const contentByLang: Record<string, { title: string; description: string; buttonText: string; modalTitle: string; modalDescription: string; modalButton: string; invalidEmail: string; successMessage: string; chatButton: string }> = {
     pt: {
@@ -114,66 +116,80 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   };
 
   const handleChatWithMenebot = () => {
-    setShowChat(true);
-    handleCloseModal();
+    setSavedEmail(email); // Salva o email antes de fechar o modal
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setShowChat(true);
+      handleCloseModal();
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const handleCloseChat = () => {
-    setShowChat(false);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setShowChat(false);
+      setIsTransitioning(false);
+    }, 300);
   };
 
   return (
     <section className="relative w-full bg-black py-32 md:py-48 lg:py-60 overflow-hidden min-h-screen">
-      {/* Menebots decorativos - SEM opacidade, totalmente visíveis */}
-      {menebotPositions.map((menebot, index) => (
-        <div
-          key={index}
-          className="absolute hidden md:block transition-transform duration-300 hover:-translate-y-2"
-          style={{
-            top: menebot.top,
-            bottom: menebot.bottom,
-            left: menebot.left,
-            right: menebot.right,
-            zIndex: 1,
-          }}
-        >
-          <img
-            src={menebot.image}
-            alt="Menebot"
-            className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 xl:w-56 xl:h-56 object-contain"
-          />
-        </div>
-      ))}
-
-      {/* Conteúdo central */}
-      <div className="relative z-10 max-w-[900px] mx-auto px-6 sm:px-6 md:px-8 lg:px-12 text-center">
-        {/* Título com Menebots nas laterais */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white font-[var(--font-montserrat)]">
-            {content.title}
-          </h2>
-        </div>
-
-        {/* Descrição - padrão Hero/MyStory */}
-        <p className="text-sm sm:text-base md:text-lg text-gray-400 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] mx-auto text-center">
-          {content.description}
-        </p>
-
-        {/* Botão CTA */}
-        <button 
-          onClick={handleOpenModal}
-          className="group relative inline-flex items-center gap-3 bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50"
-        >
-          <span className="text-lg">{content.buttonText}</span>
-          <svg 
-            className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
+      {/* Conteúdo da section com fade out durante transição */}
+      <div 
+        className={`transition-opacity duration-500 ${showChat ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        {/* Menebots decorativos - SEM opacidade, totalmente visíveis */}
+        {menebotPositions.map((menebot, index) => (
+          <div
+            key={index}
+            className="absolute hidden md:block transition-transform duration-300 hover:-translate-y-2"
+            style={{
+              top: menebot.top,
+              bottom: menebot.bottom,
+              left: menebot.left,
+              right: menebot.right,
+              zIndex: 1,
+            }}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-          </svg>
-        </button>
+            <img
+              src={menebot.image}
+              alt="Menebot"
+              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 xl:w-56 xl:h-56 object-contain"
+            />
+          </div>
+        ))}
+
+        {/* Conteúdo central */}
+        <div className="relative z-10 max-w-[900px] mx-auto px-6 sm:px-6 md:px-8 lg:px-12 text-center">
+          {/* Título com Menebots nas laterais */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white font-[var(--font-montserrat)]">
+              {content.title}
+            </h2>
+          </div>
+
+          {/* Descrição - padrão Hero/MyStory */}
+          <p className="text-sm sm:text-base md:text-lg text-gray-400 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] mx-auto text-center">
+            {content.description}
+          </p>
+
+          {/* Botão CTA */}
+          <button 
+            onClick={handleOpenModal}
+            className="group relative inline-flex items-center gap-3 bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50"
+          >
+            <span className="text-lg">{content.buttonText}</span>
+            <svg 
+              className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Modal */}
@@ -254,13 +270,15 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
         </div>
       )}
 
-      {/* Chat Component */}
+      {/* Chat Component - Ocupa toda a section com fade in */}
       {showChat && (
-        <MenebotChat
-          email={email}
-          onClose={handleCloseChat}
-          language={language}
-        />
+        <div className="absolute inset-0 z-20 animate-fadeIn">
+          <MenebotChat
+            email={savedEmail}
+            onClose={handleCloseChat}
+            language={language}
+          />
+        </div>
       )}
     </section>
   );

@@ -1,0 +1,43 @@
+{
+  "name": "menebot-server",
+  "version": "1.0.0",
+  "description": "Servidor Node.js com WebSocket para chatbot RAG usando AWS Bedrock",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "ingest": "tsx src/ingest-pdf.ts",
+    "test": "vitest",
+    "test:watch": "vitest --watch"
+  },
+  "keywords": [
+    "chatbot",
+    "bedrock",
+    "rag",
+    "websocket"
+  ],
+  "author": "Ruy Barbosa de Castro",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-bedrock": "^3.910.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.705.0",
+    "@aws-sdk/client-s3": "^3.705.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "pdf-parse": "^1.1.1",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "@types/pdf-parse": "^1.1.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

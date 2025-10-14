@@ -9,6 +9,9 @@ import { Menebot } from './components/Menebot/Menebot';
 import { TalkBox } from './components/TalkBox/TalkBox';
 import { HeroLeft } from './components/HeroLeft/HeroLeft';
 import scrollMouseIcon from './assets/icons/scroll-mouse.svg';
+import { About } from './components/About/About';
+import { MyStory } from './components/MyStory/MyStory';
+import { ChatWithMenebot } from './components/ChatWithMenebot/ChatWithMenebot';
 
 function App() {
   const [isTalkBoxVisible, setIsTalkBoxVisible] = useState(false);
@@ -310,6 +313,15 @@ function App() {
           </span>
         </div>
       </main>
+
+      {/* About Section */}
+      <About language={currentLanguage} />
+
+      {/* My Story Section */}
+      <MyStory language={currentLanguage} />
+
+      {/* Chat with Menebot Section */}
+      <ChatWithMenebot language={currentLanguage} />
     </div>
   );
 }

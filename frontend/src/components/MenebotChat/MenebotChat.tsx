@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
+import menebotFrente from '../../assets/content/menebot/menebot_frente.png';
 
 interface Message {
   id: string;
@@ -27,7 +28,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
 
   const contentByLang: Record<string, { title: string; placeholder: string; send: string; connecting: string; disconnected: string; typing: string; welcomeMessage: string }> = {
     pt: {
-      title: 'Conversa com Menebot',
+      title: 'Menebot',
       placeholder: 'Digite sua mensagem...',
       send: 'Enviar',
       connecting: 'Conectando...',
@@ -36,7 +37,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
       welcomeMessage: 'Olá! Sou o Menebot 🤖 Pergunte-me sobre Ruy Barbosa de Castro!',
     },
     en: {
-      title: 'Chat with Menebot',
+      title: 'Menebot',
       placeholder: 'Type your message...',
       send: 'Send',
       connecting: 'Connecting...',
@@ -45,7 +46,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
       welcomeMessage: 'Hello! I am Menebot 🤖 Ask me about Ruy Barbosa de Castro!',
     },
     es: {
-      title: 'Conversación con Menebot',
+      title: 'Menebot',
       placeholder: 'Escribe tu mensaje...',
       send: 'Enviar',
       connecting: 'Conectando...',
@@ -65,6 +66,19 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Atualiza mensagem de boas-vindas quando idioma muda
+  useEffect(() => {
+    if (messages.length > 0 && messages[0].id === 'welcome') {
+      setMessages((prev) => [
+        {
+          ...prev[0],
+          text: content.welcomeMessage,
+        },
+        ...prev.slice(1),
+      ]);
+    }
+  }, [language]); // Atualiza apenas quando o idioma muda
 
   // Conexão WebSocket
   useEffect(() => {
@@ -111,22 +125,26 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
       console.error('❌ Erro:', data);
       setIsTyping(false);
 
-      const errorMessage: Message = {
-        id: `error-${Date.now()}`,
-        text: data.message,
-        sender: 'bot',
-        timestamp: Date.now(),
-      };
+      // Só adiciona mensagem se houver um texto de erro
+      if (data && data.message) {
+        const errorMessage: Message = {
+          id: `error-${Date.now()}`,
+          text: data.message,
+          sender: 'bot',
+          timestamp: Date.now(),
+        };
 
-      setMessages((prev) => [...prev, errorMessage]);
+        setMessages((prev) => [...prev, errorMessage]);
+      }
     });
 
     setSocket(newSocket);
 
     return () => {
+      console.log('🔌 Limpando conexão WebSocket');
       newSocket.close();
     };
-  }, []);
+  }, []); // Array vazio - conecta apenas uma vez
 
   const handleSendMessage = () => {
     if (!inputMessage.trim() || !socket || !isConnected) return;
@@ -158,19 +176,23 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl w-full max-w-4xl h-[90vh] shadow-2xl shadow-purple-500/20 flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-24 bg-black/90 backdrop-blur-sm">
+      <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl w-full max-w-4xl h-[80vh] shadow-2xl shadow-purple-500/20 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-purple-500/30">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
-              <span className="text-2xl">🤖</span>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
+              <img 
+                src={menebotFrente} 
+                alt="Menebot" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-[var(--font-montserrat)]">
+              <h2 className="text-xl font-bold text-white font-['Roboto_Mono',monospace]">
                 {content.title}
               </h2>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 font-['Roboto_Mono',monospace]">
                 {isConnected ? '🟢 Online' : content.disconnected}
               </p>
             </div>
@@ -214,10 +236,12 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
 
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-gray-800 text-gray-100 rounded-2xl px-4 py-3">
-                <p className="text-sm font-['Roboto_Mono',monospace] text-gray-400">
-                  {content.typing}
-                </p>
+              <div className="bg-gray-800 text-gray-100 rounded-2xl px-6 py-4">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1s' }}></div>
+                  <div className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1s' }}></div>
+                  <div className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1s' }}></div>
+                </div>
               </div>
             </div>
           )}
@@ -235,12 +259,12 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
               onKeyPress={handleKeyPress}
               placeholder={content.placeholder}
               disabled={!isConnected}
-              className="flex-1 px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-['Roboto_Mono',monospace]"
             />
             <button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || !isConnected}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-['Roboto_Mono',monospace]"
             >
               {content.send}
             </button>
