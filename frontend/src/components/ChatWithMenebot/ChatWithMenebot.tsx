@@ -14,21 +14,21 @@ interface ChatWithMenebotProps {
 
 // Posições dos Menebots - simétricos e bem espaçados
   const menebotPositions = [
-    // Top Menebots - symmetric
-    { image: menebotFrente, top: '15%', left: '8%' },
-    { image: menebotDireita, top: '15%', right: '8%' },
+  // Top Menebots - symmetric
+  { image: menebotFrente, top: '15%', left: '8%', xlLeft: '4%' },
+  { image: menebotDireita, top: '15%', right: '8%', xlRight: '4%' },
     
-    // Middle Menebots - symmetric
-    { image: menebotEsquerda, top: '42%', left: '10%' },
-    { image: menebotOlhoFechado, top: '42%', right: '10%' },
+  // Middle Menebots - symmetric
+  { image: menebotEsquerda, top: '42%', left: '10%', xlLeft: '6%' },
+  { image: menebotOlhoFechado, top: '42%', right: '10%', xlRight: '6%' },
     
-    // Lower lateral Menebots - symmetric
-    { image: menebotFrente, top: '68%', left: '8%' },
-    { image: menebotPiscando, top: '68%', right: '8%' },
+  // Lower lateral Menebots - symmetric
+  { image: menebotFrente, top: '68%', left: '8%', xlLeft: '4%' },
+  { image: menebotPiscando, top: '68%', right: '8%', xlRight: '4%' },
     
-    // Bottom Menebots - symmetric
-    { image: menebotCima, bottom: '15%', left: '25%' },
-    { image: menebotBaixo, bottom: '15%', right: '25%' },
+  // Menebots entre botão e laterais, alinhados verticalmente
+  { image: menebotCima, bottom: '16%', left: '32%', xlLeft: '24%' },
+  { image: menebotBaixo, bottom: '16%', right: '32%', xlRight: '24%' },
   ];
 
 export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt' }) => {
@@ -139,11 +139,12 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       <div 
         className={`transition-opacity duration-500 ${showChat ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
-        {/* Menebots decorativos - SEM opacidade, totalmente visíveis */}
+        {/* Menebots decorativos - visíveis em lg (menores) e xl (grandes) */}
+        {/* LG: 1024px-1280px */}
         {menebotPositions.map((menebot, index) => (
           <div
-            key={index}
-            className="absolute hidden md:block transition-transform duration-300 hover:-translate-y-2"
+            key={"lg-"+index}
+            className="absolute hidden lg:block xl:hidden transition-transform duration-300 hover:-translate-y-2"
             style={{
               top: menebot.top,
               bottom: menebot.bottom,
@@ -155,40 +156,76 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
             <img
               src={menebot.image}
               alt="Menebot"
-              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 xl:w-56 xl:h-56 object-contain"
+              className="w-28 h-28 object-contain"
+            />
+          </div>
+        ))}
+        {/* XL: >1280px */}
+        {menebotPositions.map((menebot, index) => (
+          <div
+            key={"xl-"+index}
+            className="absolute hidden xl:block transition-transform duration-300 hover:-translate-y-2"
+            style={{
+              top: menebot.top,
+              bottom: menebot.bottom,
+              left: menebot.xlLeft ? menebot.xlLeft : menebot.left,
+              right: menebot.xlRight ? menebot.xlRight : menebot.right,
+              zIndex: 1,
+            }}
+          >
+            <img
+              src={menebot.image}
+              alt="Menebot"
+              className="w-56 h-56 object-contain"
             />
           </div>
         ))}
 
         {/* Conteúdo central */}
-        <div className="relative z-10 max-w-[900px] mx-auto px-6 sm:px-6 md:px-8 lg:px-12 text-center">
+        <div className="relative z-10 max-w-[900px] mx-auto px-6 sm:px-6 md:px-8 lg:px-12">
           {/* Título com Menebots nas laterais */}
           <div className="flex items-center justify-center gap-4 mb-8">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white font-[var(--font-montserrat)]">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white font-[var(--font-montserrat)] text-center">
               {content.title}
             </h2>
           </div>
 
           {/* Descrição - padrão Hero/MyStory */}
-          <p className="text-sm sm:text-base md:text-lg text-gray-400 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] mx-auto text-center">
+          <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] md:mx-auto text-justify lg:text-center">
             {content.description}
           </p>
 
           {/* Botão CTA */}
-          <button 
-            onClick={handleOpenModal}
-            className="group relative inline-flex items-center gap-3 bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50"
-          >
-            <span className="text-lg">{content.buttonText}</span>
+          <div className="flex justify-center items-center gap-12 md:gap-16">
+            {/* Menebot direita (invertido) - visível entre sm (640px) e lg (1024px) */}
+            <img 
+              src={menebotDireita} 
+              alt="Menebot" 
+              className="hidden sm:block lg:hidden w-20 h-20 md:w-28 md:h-28 object-contain transition-transform duration-300 hover:-translate-y-2 hover:scale-110"
+            />
+            
+            <button 
+              onClick={handleOpenModal}
+              className="group relative inline-flex items-center gap-3 bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold px-6 md:px-8 py-3 sm:py-3.5 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50"
+            >
+            <span className="text-sm sm:text-base md:text-lg">{content.buttonText}</span>
             <svg 
-              className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" 
+              className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
-          </button>
+            </button>
+
+            {/* Menebot esquerda (invertido) - visível entre sm (640px) e lg (1024px) */}
+            <img 
+              src={menebotEsquerda} 
+              alt="Menebot" 
+              className="hidden sm:block lg:hidden w-20 h-20 md:w-28 md:h-28 object-contain transition-transform duration-300 hover:-translate-y-2 hover:scale-110"
+            />
+          </div>
         </div>
       </div>
 
@@ -210,7 +247,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                 </h3>
                 
                 {/* Descrição */}
-                <p className="text-sm text-gray-400 font-['Roboto_Mono',monospace] mb-6 text-center">
+                <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-6 max-w-[800px] md:mx-auto text-justify lg:text-center">
                   {content.modalDescription}
                 </p>
 

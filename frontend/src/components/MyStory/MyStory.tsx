@@ -69,7 +69,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-[var(--font-montserrat)] mb-6 text-[var(--color-primary)]">
                 {content.title}
               </h2>
-              <p className="text-sm sm:text-base md:text-lg text-gray-300 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-8 text-justify">
+              <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-8 text-justify">
                 {content.description}
               </p>
             </div>

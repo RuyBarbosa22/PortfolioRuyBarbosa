@@ -9,6 +9,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "ingest": "tsx src/ingest-pdf.ts",
+    "check-llama": "tsx src/check-llama.ts",
     "test": "vitest",
     "test:watch": "vitest --watch"
   },

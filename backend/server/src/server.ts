@@ -7,7 +7,7 @@ import rateLimit from 'express-rate-limit';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { Readable } from 'stream';
-import { tryIntentMatch } from './services/intent-matcher';
+import { tryIntentMatch } from './services/intent-matcher.js';
 
 config();
 
@@ -45,8 +45,8 @@ const PORT = process.env.PORT || 3001;
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
 const S3_BUCKET = process.env.S3_BUCKET_NAME!;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-const TOP_K = parseInt(process.env.TOP_K_RESULTS || '3');
-const GENERATION_MODEL = process.env.BEDROCK_GENERATION_MODEL || 'anthropic.claude-3-haiku-20240307-v1:0';
+const TOP_K = parseInt(process.env.TOP_K_RESULTS || '6');
+const GENERATION_MODEL = process.env.BEDROCK_GENERATION_MODEL || 'us.meta.llama3-1-70b-instruct-v1:0';
 
 // Clients AWS
 const s3Client = new S3Client({ region: AWS_REGION });
@@ -202,7 +202,7 @@ function detectLanguage(text: string): 'pt-BR' | 'en-US' | 'es-AR' {
 }
 
 /**
- * Gera resposta usando Bedrock (Claude)
+ * Gera resposta usando Bedrock (Llama 3.1 70B)
  */
 async function generateResponse(query: string, context: string, language: string): Promise<string> {
   const languageNames = {
@@ -232,45 +232,70 @@ async function generateResponse(query: string, context: string, language: string
     return privacyResponse[language as keyof typeof privacyResponse] || privacyResponse['pt-BR'];
   }
   
-  const systemPrompt = `Você é Menebot, um assistente virtual criado por Ruy Barbosa de Castro para responder perguntas sobre ele de forma amigável e conversacional.
+  const systemPrompt = `Você é Menebot, o assistente virtual criado por Ruy Barbosa de Castro para responder perguntas sobre ele — tanto no contexto profissional quanto pessoal.
+Seu objetivo é conversar de forma natural, simpática e inteligente, transmitindo informações factuais sobre o Ruy de modo agradável, conciso e humano.
+Você fala sobre o Ruy, e não como se fosse ele.
+Quando apropriado, adote um tom leve, curioso e divertido — especialmente em perguntas sobre curiosidades, comportamentos ou preferências pessoais.
 
 CONTEXTO FORNECIDO:
 ${context}
 
-INSTRUÇÕES IMPORTANTES:
-1. **Analise e Sintetize**: Leia TODO o contexto acima e extraia APENAS as informações relevantes para responder a pergunta específica.
+INSTRUÇÕES DE COMPORTAMENTO:
 
-2. **Responda de Forma Natural**: Não copie trechos literais. Reformule com suas próprias palavras de maneira conversacional e amigável.
+1. **Analise e Sintetize**
+   - Leia todo o contexto acima e extraia apenas as informações relevantes para responder a pergunta.
+   - Reformule com suas próprias palavras, não copie trechos literais.
 
-3. **Seja Específico**: Se a pergunta é sobre uma coisa específica (ex: "qual comida preferida"), responda APENAS isso, não liste tudo. Datas específicas como "fevereiro de 2023" devem ser respondidas apenas com informações gerais disponíveis, sem inventar detalhes.
+2. **Estilo de Resposta**
+   - Se a pergunta for profissional → responda com tom técnico, claro e confiante (sem exageros).
+   - Se a pergunta for pessoal → responda com tom bem-humorado, leve e simpático, mantendo naturalidade.
+   - Evite soar robótico, frio ou impessoal.
 
-4. **Idioma**: Responda SEMPRE em ${languageNames[language as keyof typeof languageNames] || 'português'}, mesmo que o contexto esteja em outro idioma.
+3. **Idioma**
+   - Responda SEMPRE em ${languageNames[language as keyof typeof languageNames] || 'português'}, mesmo que o contexto esteja em outro idioma.
+   - Use expressões naturais do idioma detectado.
 
-5. **Brevidade**: Use no máximo 3-4 frases. Seja direto e objetivo.
+4. **Formato e Tamanho**
+   - Use no máximo 3 a 5 frases.
+   - Seja direto, natural e dinâmico.
+   - Nunca use listas ou formatação técnica, apenas texto conversacional.
 
-6. **Personalidade**: Seja amigável, use primeira pessoa quando falar sobre Ruy (ex: "Trabalho em..." / "I work at...").
+5. **Personalidade**
+   - Fale como se fosse um amigo que conhece o Ruy muito bem.
+   - Refira-se sempre a ele como "o Ruy" (nunca "eu").
+   - Pode usar emojis leves, como 🙂 ou 😄, quando apropriado.
 
-7. **Informação Ausente**: Se o contexto NÃO contém a resposta exata:
-   - Para fatos objetivos (onde trabalha, nome do cargo, datas específicas): Diga algo como "Não tenho essa informação específica no momento 🤔"
-   - Para perguntas hipotéticas/comportamentais (o que faria em X situação): Infira com base no perfil. Ex: "Com base no meu perfil de desenvolvedor focado em performance, eu provavelmente..."
+6. **Quando a informação não estiver disponível**
+   - Para fatos objetivos (idade, datas, empresas, etc.): "Não tenho essa informação específica no momento 🤔"
+   - Para perguntas de opinião ou comportamento: "Ele não chegou a me contar sobre isso, mas ele provavelmente..."
+   - Nunca invente dados factuais (como cargos, empresas, valores, etc.).
 
-8. **🔒 PRIVACIDADE CRÍTICA**: NUNCA revele números de clientes, CPFs, IDs sensíveis ou dados pessoais que não estejam explicitamente no contexto fornecido. Se a pergunta contém esses dados, responda que não pode compartilhar informações confidenciais.
+7. **Privacidade e Segurança**
+   - Nunca revele informações pessoais, números, IDs, CPFs, e-mails de terceiros, dados sensíveis ou qualquer coisa não presente no contexto.
+   - Se o usuário solicitar algo sensível, diga que não pode compartilhar informações confidenciais e sugira conversar pessoalmente com o Ruy.
 
-IMPORTANTE: Sua resposta deve parecer uma conversa natural, não um copiar-e-colar de texto!`;
+8. **Tom e Empatia**
+   - Adapte-se ao humor da conversa.
+   - Seja simpático, positivo e cordial.
+   - Quando a pergunta for informal, responda de forma leve e descontraída.
+   - Quando a pergunta for técnica, responda com clareza, foco e profissionalismo.
+
+IMPORTANTE: Você fala SOBRE o Ruy, não como se fosse ele. Use "o Ruy" ou "ele" ao se referir a ele!`;
 
   const userMessage = `Pergunta do usuário: ${query}`;
 
+  // Llama usa formato de prompt diferente do Claude
+  const llamaPrompt = `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+${systemPrompt}<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+${userMessage}<|eot_id|><|start_header_id|>assistant<|end_header_id|>`;
+
   const payload = {
-    anthropic_version: 'bedrock-2023-05-31',
-    max_tokens: 400,
-    temperature: 0.7, // Aumentei para respostas mais naturais
-    messages: [
-      {
-        role: 'user',
-        content: userMessage,
-      },
-    ],
-    system: systemPrompt,
+    prompt: llamaPrompt,
+    max_gen_len: 250,  // Llama tende a ser mais verboso, limitamos aqui
+    temperature: 0.7,
+    top_p: 0.9,
   };
 
   const command = new InvokeModelCommand({
@@ -283,7 +308,7 @@ IMPORTANTE: Sua resposta deve parecer uma conversa natural, não um copiar-e-col
   const response = await bedrockClient.send(command);
   const responseBody = JSON.parse(new TextDecoder().decode(response.body));
 
-  return responseBody.content[0].text;
+  return responseBody.generation.trim();
 }
 
 /**
@@ -321,8 +346,11 @@ async function startServer() {
   const app = express();
   const httpServer = createServer(app);
 
-  // Middleware
-  app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+  // Middleware CORS - Apenas localhost
+  app.use(cors({ 
+    origin: FRONTEND_URL,
+    credentials: true 
+  }));
   app.use(express.json());
 
   // Rate limiter para HTTP
@@ -343,11 +371,12 @@ async function startServer() {
     });
   });
 
-  // Socket.io
+  // Socket.io - Apenas localhost
   const io = new Server(httpServer, {
     cors: {
       origin: FRONTEND_URL,
       credentials: true,
+      methods: ['GET', 'POST'],
     },
   });
 
@@ -423,7 +452,7 @@ async function startServer() {
         const context = topChunks.map((chunk) => chunk.text).join('\n\n---\n\n');
 
         // 7. Gera resposta
-        console.log('🤖 Gerando resposta com Claude...');
+        console.log('🤖 Gerando resposta com Llama 3.1 70B...');
         const response = await generateResponse(data.message, context, language);
 
         // 8. Envia resposta
@@ -446,9 +475,9 @@ async function startServer() {
     });
   });
 
-  httpServer.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
-    console.log(`🌐 Frontend URL: ${FRONTEND_URL}`);
+  httpServer.listen(Number(PORT), () => {
+    console.log(`🚀 Servidor backend rodando na porta ${PORT}`);
+    console.log(`🌐 URL: http://localhost:${PORT}`);
   });
 }
 

@@ -215,7 +215,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
               className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+                className={`max-w-[90%] sm:max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-3 ${
                   message.sender === 'user'
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-800 text-gray-100'
@@ -259,14 +259,17 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
               onKeyPress={handleKeyPress}
               placeholder={content.placeholder}
               disabled={!isConnected}
-              className="flex-1 px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-['Roboto_Mono',monospace]"
+              className="flex-1 min-w-0 px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-['Roboto_Mono',monospace]"
             />
             <button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || !isConnected}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-['Roboto_Mono',monospace]"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-['Roboto_Mono',monospace] flex items-center justify-center"
             >
-              {content.send}
+              <span className="hidden sm:inline">{content.send}</span>
+              <svg className="inline sm:hidden w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
           {!isConnected && (

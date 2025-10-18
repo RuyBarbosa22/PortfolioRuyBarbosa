@@ -1,4 +1,4 @@
-import faqs from '../data/faqs.json';
+import faqs from '../data/faqs.json' with { type: 'json' };
 
 export interface FAQ {
   id: string;

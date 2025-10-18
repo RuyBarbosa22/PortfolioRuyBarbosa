@@ -12,6 +12,20 @@ import scrollMouseIcon from './assets/icons/scroll-mouse.svg';
 import { About } from './components/About/About';
 import { MyStory } from './components/MyStory/MyStory';
 import { ChatWithMenebot } from './components/ChatWithMenebot/ChatWithMenebot';
+import htmlIcon from './assets/icons/icons8-html.svg';
+import cssIcon from './assets/icons/icons8-css.svg';
+import jsIcon from './assets/icons/icons8-js.svg';
+import nodeIcon from './assets/icons/node-js-svgrepo-com.svg';
+import astroIcon from './assets/icons/icons8-tailwind-css.svg';
+import reactIcon from './assets/icons/react-svgrepo-com.svg';
+import kotlinIcon from './assets/icons/icons8-kotlin.svg';
+import javaIcon from './assets/icons/icons8-java.svg';
+import angularIcon from './assets/icons/icons8-angular.svg';
+import tsIcon from './assets/icons/icons8-typescript.svg';
+import awsIcon from './assets/icons/icons8-aws.svg';
+import mysqlIcon from './assets/icons/mysql-svgrepo-com.svg';
+import leafIcon from './assets/icons/swagger-svgrepo-com.svg';
+import pythonIcon from './assets/icons/python-svgrepo-com.svg';
 
 function App() {
   const [isTalkBoxVisible, setIsTalkBoxVisible] = useState(false);
@@ -20,7 +34,7 @@ function App() {
 
   console.log('🌐 App - Idioma atual:', currentLanguage);
 
-  // Array de mensagens do Menebot
+  // Array de mensagens do Menebot - traduções
     // Translations for Menebot messages
     const menebotMessagesByLang: Record<string, string[]> = {
       pt: [
@@ -38,45 +52,25 @@ function App() {
       es: [
         "¡Hola! Soy Menebot — creado para ayudarte a conocer a mi creador. Puedo responder tus preguntas y orientarte sobre cómo puede ayudarte.",
         "Ruy Barbosa es un desarrollador fullstack apasionado por crear soluciones innovadoras. Domina tecnologías modernas y siempre busca nuevos desafíos!",
-        "¿Quieres saber más sobre sus proyectos? ¿O conversar directamente? Estoy aquí para guiarte — explora el portafolio o contáctalo.",
-        "No dudes en hacer clic en los botones de arriba para conversar o descargar el CV. ¡Será un placer ayudar! 😊"
-      ]
-    };
-    const menebotMessages = menebotMessagesByLang[currentLanguage];
+        "¿Quieres saber más sobre sus proyectos? ¿O conversar directamente? Estoy aquí para guiarte — explora el portafolio o ponte en contacto.",
+    "No dudes en hacer clic en los botones de arriba para conversar o descargar el CV. ¡Será un placer ayudarte! 😊"
+  ]
+  };
 
-  const handleMenebotClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Funciona em todas as resoluções
-    if (!isTalkBoxVisible) {
-      setIsTalkBoxVisible(true);
-      setCurrentMessageIndex(0);
-    } else {
-      // Avançar para próxima mensagem
-        if (currentMessageIndex < menebotMessages.length - 1) {
-          setCurrentMessageIndex(currentMessageIndex + 1);
-        } else {
-          // Recomeçar do início
-          setCurrentMessageIndex(0);
-        }
-    }
+  // Derived messages for current language
+  const menebotMessages = menebotMessagesByLang[currentLanguage] || menebotMessagesByLang.pt;
+
+  // Handlers that were referenced but not defined - lightweight safe stubs
+  const handleClickOutside = () => {
+    // No-op for now; used to close overlays on outside click
+  };
+
+  const handleMenebotClick = () => {
+    setIsTalkBoxVisible((v) => !v);
   };
 
   const handleTalkBoxClick = () => {
-    // Avançar para próxima mensagem
-    if (currentMessageIndex < menebotMessages.length - 1) {
-      setCurrentMessageIndex(currentMessageIndex + 1);
-    } else {
-      // Recomeçar do início
-      setCurrentMessageIndex(0);
-    }
-  };
-
-  const handleClickOutside = () => {
-    // Fechar TalkBox e resetar
-    if (isTalkBoxVisible) {
-      setIsTalkBoxVisible(false);
-      setCurrentMessageIndex(0);
-    }
+    setCurrentMessageIndex((i) => (i + 1) % (menebotMessages.length || 1));
   };
 
   // Fechar TalkBox quando Menebot dormir
@@ -109,10 +103,21 @@ function App() {
  <div className="flex flex-col xl:flex-row md:items-center xl:justify-start gap-8 xl:gap-0 w-full">
             
             {/* LEFT - Conteúdo Textual e Botões (componentizado) */}
-            <HeroLeft language={currentLanguage} onPrimaryClick={() => { setIsTalkBoxVisible(true); setCurrentMessageIndex(0); }} />
+            <HeroLeft 
+              language={currentLanguage} 
+              onPrimaryClick={() => {
+                setIsTalkBoxVisible(true); 
+                setCurrentMessageIndex(0);
+                // Scroll suave até a section 'Fale com o menebot'
+                const menebotSection = document.getElementById('chat-with-menebot-section');
+                if (menebotSection) {
+                  menebotSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }} 
+            />
 
   {/* container scrollDown */}
-  <div className="md:hidden w-full flex flex-col items-center gap-3 si-responsive-mt mb-20 z-0 pointer-events-auto bg-green-200">
+  <div className="md:hidden w-full flex flex-col items-center gap-3 si-responsive-mt mb-20 z-0 pointer-events-auto ">
               <div className="flex flex-col items-center justify-center">
                 <img
                   src={scrollMouseIcon}
@@ -124,7 +129,7 @@ function App() {
                   }}
                 />
                 <span
-                  className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider mt-1"
+                  className="text-white/60 text-xs sm:text-sm uppercase tracking-wider mt-1"
                   style={{
                     animation: 'scrollBounce 2s ease-in-out infinite',
                     animationDelay: '0.1s'
@@ -150,7 +155,7 @@ function App() {
                   }}
                 />
                 <span
-                  className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider mt-1"
+                  className="text-white/60 text-xs sm:text-sm uppercase tracking-wider mt-1"
                   style={{
                     animation: 'scrollBounce 2s ease-in-out infinite',
                     animationDelay: '0.1s'
@@ -175,7 +180,7 @@ function App() {
                   }}
                 />
                 <span
-                  className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider mt-1"
+                  className="text-white/60 text-xs sm:text-sm uppercase tracking-wider mt-1"
                   style={{
                     animation: 'scrollBounce 2s ease-in-out infinite',
                     animationDelay: '0.1s'
@@ -217,14 +222,14 @@ function App() {
                   {!isTalkBoxVisible ? (
                     <div className="text-center">
                       <p 
-                        className="text-white/90 font-[var(--font-montserrat)] font-semibold text-base sm:text-lg mb-2"
+                        className="text-white/90 font-semibold text-base sm:text-lg mb-2"
                         style={{
                           textShadow: '0 0 10px rgba(167, 139, 250, 0.6), 0 0 20px rgba(167, 139, 250, 0.4)'
                         }}
                       >
                         {translations[currentLanguage].touchTitle}
                       </p>
-                      <p className="text-white/50 text-xs sm:text-sm font-[var(--font-montserrat)]">
+                      <p className="text-white/50 text-xs sm:text-sm">
                         {translations[currentLanguage].touchSubtitle}
                       </p>
                     </div>
@@ -264,14 +269,14 @@ function App() {
                   {!isTalkBoxVisible ? (
                     <div className="text-right">
                       <p 
-                        className="text-white/90 font-[var(--font-montserrat)] font-semibold text-xl mb-2"
+                        className="text-white/90 font-semibold text-xl mb-2"
                         style={{
                           textShadow: '0 0 10px rgba(167, 139, 250, 0.6), 0 0 20px rgba(167, 139, 250, 0.4)'
                         }}
                       >
                         {translations[currentLanguage].touchTitle}
                       </p>
-                      <p className="text-white/50 text-base font-[var(--font-montserrat)]">
+                      <p className="text-white/50 text-base">
                         {translations[currentLanguage].touchSubtitle}
                       </p>
                     </div>
@@ -303,7 +308,7 @@ function App() {
             }}
           />
           <span 
-            className="text-white/60 text-xs sm:text-sm font-[var(--font-montserrat)] uppercase tracking-wider"
+            className="text-white/60 text-xs sm:text-sm uppercase tracking-wider"
             style={{
               animation: 'scrollBounce 2s ease-in-out infinite',
               animationDelay: '0.1s'
@@ -321,7 +326,87 @@ function App() {
       <MyStory language={currentLanguage} />
 
       {/* Chat with Menebot Section */}
-      <ChatWithMenebot language={currentLanguage} />
+      <section id="chat-with-menebot-section">
+        <ChatWithMenebot language={currentLanguage} />
+      </section>
+
+      {/* Section: Projetos e Tecnologias - reorganized into left/right container */}
+  <section className="">
+    <div className="w-full bg-black py-28 max-w-[1600px] mx-auto">
+      <div className="w-full flex flex-col md:flex-row gap-12 items-start">
+        {/* Container com left e right */}
+        <div className="w-full flex flex-col md:flex-row gap-8">
+          {/* LEFT: ocupa ~60% em desktop */}
+          <div className="flex-1 lg:w-[50%] flex flex-col px-6 sm:pl-6 sm:px-0 md:pl-8 lg:pl-12">
+            {/* UP: title projetos + texto */}
+            <div className="mb-8 flex flex-col items-center md:items-start">
+              <h2 className="text-5xl md:text-7xl font-extrabold text-white mb-4">Projetos</h2>
+              <p className="text-lg md:text-xl text-justify text-gray-200 font-['Roboto_Mono',monospace] font-semibold mb-2 tracking-wide" style={{ letterSpacing: '0.02em' }}>
+                Veja um pouco do melhor do meu trabalho! Explore meus projetos acadêmicos e de aprendizado, onde apliquei minhas habilidades e cresci como desenvolvedor.
+              </p>
+            </div>
+
+            {/* DOWN: tecnologias que domino + icones */}
+            <div className="flex flex-col gap-4 w-full">
+              <div className="">
+                <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-4">Tecnologias que domino</h3>
+              </div>
+
+              <div className="flex flex-wrap gap-4  w-3/3 items-center">
+                <img src={htmlIcon} alt="HTML5" title="HTML5" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={cssIcon} alt="CSS3" title="CSS3" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={jsIcon} alt="JavaScript" title="JavaScript" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={nodeIcon} alt="Node.js" title="Node.js" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={astroIcon} alt="Tailwind" title="Tailwind CSS" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={reactIcon} alt="React" title="React" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={kotlinIcon} alt="Kotlin" title="Kotlin" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={javaIcon} alt="Java" title="Java" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={angularIcon} alt="Angular" title="Angular" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={tsIcon} alt="TypeScript" title="TypeScript" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={awsIcon} alt="AWS" title="AWS" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={mysqlIcon} alt="MySQL" title="MySQL" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={pythonIcon} alt="Python" title="Python" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+                <img src={leafIcon} alt="Swagger" title="Swagger" className="w-10 h-10 bg-[#18181b] rounded-lg p-1" />
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT: área verde com um card */}
+          <div className="w-full md:w-[50%] flex items-center justify-center bg-pink-300">
+            <div className="w-full bg-[#0f9d58] rounded-lg p-6 flex items-center justify-center shadow-lg max-w-md">
+              <div className="w-full bg-black/20 rounded-md p-4">
+                <h4 className="text-xl font-bold text-white mb-2">Destaque do Projeto</h4>
+                <p className="text-sm text-white/90">Este é um card simples dentro da área verde. Coloque aqui um destaque, link ou resumo do projeto.</p>
+                <div className="mt-4 flex gap-2">
+                  <a href="#" className="px-3 py-2 bg-white/10 text-white rounded-md text-sm">Ver mais</a>
+                  <a href="#" className="px-3 py-2 bg-white/20 text-white rounded-md text-sm">Código</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Centered CTA button */}
+      <div className="w-full flex justify-center mt-8 lg:pr-12">
+        <a href="https://github.com/RuyBarbosa22" target="_blank" rel="noreferrer" className="w-auto min-w-[200px] px-6 md:px-8 py-3 sm:py-3.5 bg-[var(--color-primary)] text-white font-semibold text-sm sm:text-base rounded-full hover:bg-[var(--color-primary-light)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.6)] transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1-.02-1.96-3.2.7-3.88-1.54-3.88-1.54-.53-1.36-1.3-1.72-1.3-1.72-1.06-.73.08-.72.08-.72 1.17.08 1.79 1.2 1.79 1.2 1.04 1.78 2.73 1.26 3.4.96.11-.75.41-1.26.74-1.55-2.55-.29-5.23-1.28-5.23-5.71 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18.92-.26 1.9-.39 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.81 1.19 1.84 1.19 3.1 0 4.44-2.69 5.41-5.25 5.7.42.36.79 1.09.79 2.2 0 1.59-.01 2.87-.01 3.26 0 .3.21.67.8.55C20.71 21.39 24 17.08 24 12c0-6.27-5.23-11.5-12-11.5z"/></svg>
+          <span>Veja no GitHub</span>
+        </a>
+      </div>
+    </div>
+  </section>
+      
+      {/* Placeholder: Seção adicional abaixo de Projetos - crie conteúdo aqui */}
+      <section className="w-full bg-[#050508] py-20 px-4 lg:pl-12 lg:pr-0 max-w-[1600px] mx-auto">
+        <div className="w-full flex flex-col items-center gap-6">
+          <h3 className="text-4xl font-extrabold text-white">Mais sobre os projetos</h3>
+          <p className="max-w-3xl text-center text-gray-300">Aqui você pode adicionar uma descrição mais detalhada, links diretos para cada projeto, ou depoimentos de usuários. Se quiser, eu crio cards de destaque ou uma grade com filtros.</p>
+          <div className="w-full flex justify-center mt-4">
+            <a href="#" className="px-5 py-3 bg-[var(--color-primary)] rounded-full text-white font-semibold">Ver detalhes</a>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
