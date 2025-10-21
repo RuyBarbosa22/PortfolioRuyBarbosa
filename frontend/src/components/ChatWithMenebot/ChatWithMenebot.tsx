@@ -38,7 +38,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   const [isValidated, setIsValidated] = useState(false);
   const [showCheckAnimation, setShowCheckAnimation] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  // const [isTransitioning, setIsTransitioning] = useState(false); // unused - removed
   const [savedEmail, setSavedEmail] = useState(''); // Email salvo para o chat
 
   const contentByLang: Record<string, { title: string; description: string; buttonText: string; modalTitle: string; modalDescription: string; modalButton: string; invalidEmail: string; successMessage: string; chatButton: string }> = {
@@ -117,19 +117,17 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
 
   const handleChatWithMenebot = () => {
     setSavedEmail(email); // Salva o email antes de fechar o modal
-    setIsTransitioning(true);
     setTimeout(() => {
       setShowChat(true);
       handleCloseModal();
-      setIsTransitioning(false);
+      // transition state removed
     }, 300);
   };
 
   const handleCloseChat = () => {
-    setIsTransitioning(true);
     setTimeout(() => {
       setShowChat(false);
-      setIsTransitioning(false);
+      // transition state removed
     }, 300);
   };
 
@@ -182,10 +180,10 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
         ))}
 
         {/* Conteúdo central */}
-        <div className="relative z-10 max-w-[900px] mx-auto px-6 sm:px-6 md:px-8 lg:px-12">
+        <div className="relative z-10 max-w-[900px] mx-auto px-6 sm:px-8 md:px-8 lg:px-12">
           {/* Título com Menebots nas laterais */}
           <div className="flex items-center justify-center gap-4 mb-8">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white font-[var(--font-montserrat)] text-center">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white text-center">
               {content.title}
             </h2>
           </div>
@@ -242,7 +240,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
             {!isValidated ? (
               <>
                 {/* Título */}
-                <h3 className="text-2xl sm:text-3xl font-bold text-white font-[var(--font-montserrat)] mb-2 text-center">
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2 text-center">
                   {content.modalTitle}
                 </h3>
                 

@@ -31,7 +31,7 @@ export const PolaroidCarousel: React.FC<PolaroidCarouselProps> = ({ images, alt 
     <div 
       className="relative bg-white shadow-2xl transform hover:rotate-0 transition-all duration-500 ease-out
         w-auto min-h-[280px] p-6 pb-28 
-        sm:w-[340px] sm:min-h-[420px] sm:p-8 sm:pb-28 
+        sm:w-[340px] sm:min-h-[420px] md:p-8 sm:pb-28 
         md:w-[380px] md:min-h-[420px] md:pb-32
         xl:w-[480px] xl:min-h-[620px] xl:p-10 xl:pb-24"
       onMouseEnter={() => setIsHovering(true)}

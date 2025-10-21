@@ -25,6 +25,8 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
   const [isTyping, setIsTyping] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
 
   const contentByLang: Record<string, { title: string; placeholder: string; send: string; connecting: string; disconnected: string; typing: string; welcomeMessage: string }> = {
     pt: {
@@ -58,9 +60,18 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
 
   const content = contentByLang[language];
 
-  // Auto-scroll para última mensagem
+  // Auto-scroll para última mensagem — apenas dentro do container de mensagens
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    // Scroll até o fim do container (com smooth)
+    try {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    } catch (e) {
+      // fallback para navegadores que não suportam smooth
+      container.scrollTop = container.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -207,8 +218,8 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
           </button>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+  {/* Messages Area */}
+  <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 menebot-scrollbar">
           {messages.map((message) => (
             <div
               key={message.id}

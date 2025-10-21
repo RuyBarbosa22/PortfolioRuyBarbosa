@@ -70,13 +70,13 @@ export function TalkBox({ isVisible, message, onComplete, onClick, hint, botName
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--color-primary)]/20">
             <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse"></div>
-            <span className="text-[var(--color-primary)] font-[var(--font-montserrat)] text-xs font-semibold">
+            <span className="text-[var(--color-primary)] text-xs font-semibold">
               {botName ?? 'Menebot'}
             </span>
           </div>
           
-          {showHint && (
-            <span className="text-white/60 font-[var(--font-montserrat)] text-xs italic animate-pulse">
+            {showHint && (
+            <span className="text-white/60 text-xs italic animate-pulse">
               {hint ?? 'Clique para continuar →'}
             </span>
           )}

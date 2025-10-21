@@ -81,7 +81,7 @@ export function TypewriterText({
   const wordClass = isFullstackComplete ? 'typewriter-word fullstack' : 'typewriter-word purple';
 
   return (
-    <span className="inline-block min-w-[180px] sm:min-w-[240px] md:min-w-[340px] lg:min-w-[480px] xl:min-w-[520px] align-middle whitespace-nowrap" style={{ background: 'transparent', verticalAlign: 'middle' }}>
+    <span className="inline-block min-w-[180px] sm:min-w-[240px] md:min-w-[340px] lg:w-auto align-middle whitespace-nowrap" style={{ background: 'transparent', verticalAlign: 'middle' }}>
       {/* Texto (usa classes CSS definidas acima) */}
       <span className={wordClass}>
         {/* quando currentText for vazio, deixamos string vazia (o min-w do wrapper já mantém espaço) */}

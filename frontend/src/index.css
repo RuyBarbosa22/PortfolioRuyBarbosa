@@ -199,3 +199,37 @@
   }
 }
 
+/* tailwind.css ou globals.css */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+/* Scrollbar customizada apenas para o TalkBox/Menebot */
+.menebot-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125,68,255,0.9) rgba(10,10,12,0.4);
+}
+.menebot-scrollbar::-webkit-scrollbar {
+  width: 12px;
+}
+.menebot-scrollbar::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, rgba(10,10,12,0.6), rgba(10,10,12,0.35));
+  border-left: 1px solid rgba(125,68,255,0.06);
+  border-radius: 12px;
+  margin: 8px 0;
+}
+.menebot-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #E204F5 0%, #7D44FF 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(10,10,12,0.45);
+  box-shadow: 0 4px 14px rgba(125,68,255,0.18);
+}
+.menebot-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FF6CF0 0%, #9d6fff 100%);
+}
+
