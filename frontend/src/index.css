@@ -233,3 +233,27 @@
   background: linear-gradient(180deg, #FF6CF0 0%, #9d6fff 100%);
 }
 
+/* Scrollbar global (aplica em todo o site) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b; /* mesmo fundo do site (provável bg-zinc-950 ou bg-neutral-950) */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #7D44FF; /* purple-500 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #7D44FF; /* purple-400 */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #7D44FF #09090b;
+}

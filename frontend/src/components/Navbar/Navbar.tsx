@@ -52,7 +52,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
     <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
       isScrolled ? 'bg-black/60 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.5)]' : ''
     }`}>
-      <nav className="flex lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-between lg:gap-8 px-4 sm:px-6 lg:px-12 py-3.5 max-w-[1600px] mx-auto text-white">
+      <nav className="flex lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-between lg:gap-8 px-4 sm:px-6 lg:px-12 xl:px-20 py-3.5 text-white">
         {/* Hamburger Menu Button - Mobile Only */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

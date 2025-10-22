@@ -53,7 +53,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
       id="historia"
       className="relative w-full bg-black py-20 md:py-32 lg:py-40"
     >
-      <div className="max-w-[1400px] mx-auto px-6 sm:px-8 md:px-8 lg:px-12">
+      <div className="px-6 sm:px-8 md:px-8 lg:px-12 xl:px-20">
         {/* Layout Mobile: Grid 1 coluna */}
         {/* Layout Tablet/Desktop (≥768px): Flex com proporções 40%/60% */}
         <div className="flex flex-col md:flex-row gap-12 md:gap-6 lg:gap-12 xl:gap-16 items-start xl:items-stretch">
