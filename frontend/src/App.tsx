@@ -7,6 +7,7 @@ import type { Lang } from "./i18n";
 import { AnimatedBackground } from "./components/AnimatedBackground/AnimatedBackground";
 import { Menebot } from "./components/Menebot/Menebot";
 import { TalkBox } from "./components/TalkBox/TalkBox";
+import type { TalkBoxHandle } from "./components/TalkBox/TalkBox";
 import { HeroLeft } from "./components/HeroLeft/HeroLeft";
 import scrollMouseIcon from "./assets/icons/scroll-mouse.svg";
 import { About } from "./components/About/About";
@@ -15,6 +16,7 @@ import springIcon from "./assets/icons/icons8-spring-logo.svg";
 import tsIcon from "./assets/icons/icons8-typescript.svg";
 import nodeIcon from "./assets/icons/node-js-svgrepo-com.svg";
 import { MyStory } from "./components/MyStory/MyStory";
+import Skills from "./components/Skills/Skills";
 import { ChatWithMenebot } from "./components/ChatWithMenebot/ChatWithMenebot";
 import { useRef } from "react";
 import type { CarouselHandle } from "./components/ProjectsCarousel/Carousel";
@@ -32,39 +34,62 @@ import pythonIcon from "./assets/icons/python-svgrepo-com.svg";
 import Carousel from "./components/ProjectsCarousel/Carousel";
 import dockerIcon from "./assets/icons/docker-svgrepo-com.svg";
 import Footer from "./components/Footer/Footer";
+import ContactForm from "./components/ContactForm/ContactForm";
 
 function App() {
   const [isTalkBoxVisible, setIsTalkBoxVisible] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [menebotExiting, setMenebotExiting] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<Lang>(
     defaultLanguage as Lang
   );
 
   // ref to control Carousel from this parent
   const carouselRef = useRef<CarouselHandle | null>(null);
+  const talkBoxRef = useRef<TalkBoxHandle | null>(null);
 
   console.log("🌐 App - Idioma atual:", currentLanguage);
 
   // Array de mensagens do Menebot - traduções
-  // Translations for Menebot messages
   const menebotMessagesByLang: Record<string, string[]> = {
     pt: [
       "Olá! Eu sou o Menebot — criado para te ajudar a conhecer meu criador. Posso responder suas perguntas e orientar como ele pode te ajudar.",
       "Ruy Barbosa é um desenvolvedor fullstack apaixonado por criar soluções inovadoras. Ele domina tecnologias modernas e está sempre em busca de novos desafios!",
-      "Quer saber mais sobre os projetos dele? Ou talvez conversar diretamente? Estou aqui para te guiar — explore o portfólio ou entre em contato.",
+      "Ei! Que tal me conhecer de um jeito diferente? Podemos bater um papo agora e você vê como eu funciono na prática. Quer conversar comigo?",
       "Não hesite em clicar nos botões acima para conversar ou baixar o CV. Será um prazer ajudar! 😊",
+      "E vamos as curiosidades! Vamos explorar um pouco mais sobre a pessoa por trás do desenvolvedor.",
+      "Você sabia que o Ruy tem uma cicatriz por conta de um suposto 'ataque de marimbondo'?",
+      "A parte engraçada é que ele na verdade ganhou a cicatriz fugindo do inseto, e não por causa da picada!",
+      "Por incrivel que pareça, o Ruy já chegou a dormir 16 horas seguidas em um fim de semana, isso que é recorde!",
+      "Quando criança, o Ruy chegou a ser internado por achar que tomar 4x mais dipirona do que o recomendado ia curar a dor de cabeça dele mais rápido, dá pra acreditar?",
+      "Nas horas vagas, além de jogar, o Ruy gosta bastante de drinks, e já té chegou a trabalhar como bartender em várias festas!",
+      "Quer continuar conhecendo o Ruy e ter acesso a informações exclusivas? Venha falar comigo!",
     ],
     en: [
-      "Hi! I'm Menebot — I was built to help you get to know my creator. I can answer questions and guide you on how he can help.",
-      "Ruy Barbosa is a passionate fullstack developer who loves building innovative solutions. He masters modern technologies and is always seeking new challenges!",
-      "Want to learn more about his projects? Or chat directly? I'm here to guide you — explore the portfolio or reach out.",
-      "Don't hesitate to click the buttons above to talk or download the CV. I'd be happy to help! 😊",
+      "Hey there! I'm Menebot — created to help you get to know my creator. I can answer your questions and show you how he can help you out.",
+      "Ruy Barbosa is a fullstack developer who loves building innovative solutions. He masters modern technologies and is always up for a new challenge!",
+      "Hey! How about getting to know me in a different way? We can have a quick chat right now so you can see how I work in action. Wanna talk?",
+      "Don’t hesitate to click the buttons above to chat or download the CV. I’ll be happy to help! 😊",
+      "Alright, time for some fun facts! Let’s dig a little deeper into the person behind the developer.",
+      "Did you know Ruy has a scar from what he calls a ‘wasp attack’?",
+      "The funny part? He actually got the scar while *running away* from the wasp — not from the sting itself!",
+      "Believe it or not, Ruy once slept for 16 hours straight on a weekend. That’s what we call commitment to rest!",
+      "When he was a kid, he once ended up in the hospital because he thought taking 4 times more painkillers would make his headache go away faster — can you believe that?",
+      "In his free time, besides gaming, Ruy loves mixing drinks — and he’s even worked as a bartender at several parties!",
+      "Wanna keep discovering more about Ruy and get exclusive insights? Come chat with me!",
     ],
     es: [
-      "¡Hola! Soy Menebot — creado para ayudarte a conocer a mi creador. Puedo responder tus preguntas y orientarte sobre cómo puede ayudarte.",
-      "Ruy Barbosa es un desarrollador fullstack apasionado por crear soluciones innovadoras. Domina tecnologías modernas y siempre busca nuevos desafíos!",
-      "¿Quieres saber más sobre sus proyectos? ¿O conversar directamente? Estoy aquí para guiarte — explora el portafolio o ponte en contacto.",
-      "No dudes en hacer clic en los botones de arriba para conversar o descargar el CV. ¡Será un placer ayudarte! 😊",
+      "¡Hola! Soy Menebot — creado para ayudarte a conocer a mi creador. Puedo responder tus preguntas y contarte cómo puede ayudarte.",
+      "Ruy Barbosa es un desarrollador fullstack apasionado por crear soluciones innovadoras. Domina tecnologías modernas y siempre está listo para nuevos desafíos.",
+      "¡Oye! ¿Qué te parece si me conoces de una manera diferente? Podemos charlar ahora mismo para que veas cómo funciono en acción. ¿Quieres conversar conmigo?",
+      "No dudes en hacer clic en los botones de arriba para charlar o descargar el CV. ¡Será un placer ayudarte! 😊",
+      "¡Hora de las curiosidades! Vamos a conocer un poco más sobre la persona detrás del desarrollador.",
+      "¿Sabías que Ruy tiene una cicatriz por culpa de un supuesto ‘ataque de avispas’?",
+      "¡Lo divertido es que en realidad se hizo la cicatriz mientras huía del insecto, no por la picadura!",
+      "Aunque parezca increíble, Ruy una vez durmió 16 horas seguidas en un fin de semana. ¡Eso sí es descansar de verdad!",
+      "Cuando era niño, llegó a ser internado porque pensó que tomar 4 veces más dipirona le quitaría el dolor de cabeza más rápido. ¿Puedes creerlo?",
+      "En su tiempo libre, además de jugar, a Ruy le encantan los tragos, ¡e incluso trabajó como bartender en varias fiestas!",
+      "¿Quieres seguir conociendo más sobre Ruy y acceder a información exclusiva? ¡Ven a hablar conmigo!",
     ],
   };
 
@@ -72,16 +97,53 @@ function App() {
   const menebotMessages =
     menebotMessagesByLang[currentLanguage] || menebotMessagesByLang.pt;
 
+  // Contact subheading split (prefix + highlighted suffix) - safe fallback without optional chaining
+  const contactSubObj = translations[currentLanguage] && translations[currentLanguage].contact ? translations[currentLanguage].contact : null;
+  const contactSubheading = (contactSubObj && contactSubObj.subheading) || translations.pt.contact.subheading;
+  let contactPrefix = contactSubheading;
+  let contactSuffix = "";
+  const lastSpace = contactSubheading.trim().lastIndexOf(" ");
+  if (lastSpace > 0) {
+    contactPrefix = contactSubheading.slice(0, lastSpace);
+    contactSuffix = contactSubheading.slice(lastSpace + 1);
+  }
+
   // Handlers that were referenced but not defined - lightweight safe stubs
   const handleClickOutside = () => {
-    // No-op for now; used to close overlays on outside click
+    // Close and reset Menebot dialog flow when clicking outside
+    if (isTalkBoxVisible) {
+      setIsTalkBoxVisible(false);
+      setCurrentMessageIndex(0);
+    }
+    if (menebotExiting) setMenebotExiting(false);
   };
 
   const handleMenebotClick = () => {
-    setIsTalkBoxVisible((v) => !v);
+    // if not visible, open and start from current index
+    if (!isTalkBoxVisible) {
+      // always start a fresh flow from the first message when opening
+      setCurrentMessageIndex(0);
+      setIsTalkBoxVisible(true);
+      return;
+    }
+
+    // If confirm buttons are shown for the current message, ignore Menebot clicks
+    if (isConfirmIndex) return;
+
+    // If visible, ask TalkBox to finish typing; if it was already finished, advance to next
+    if (talkBoxRef.current) {
+      const didFinish = talkBoxRef.current.finishTyping();
+      if (!didFinish) {
+        setCurrentMessageIndex((i) => (i + 1) % (menebotMessages.length || 1));
+      }
+    } else {
+      setCurrentMessageIndex((i) => (i + 1) % (menebotMessages.length || 1));
+    }
   };
 
   const handleTalkBoxClick = () => {
+    // If confirm buttons are shown, do not advance by clicking the TalkBox
+    if (isConfirmIndex) return;
     setCurrentMessageIndex((i) => (i + 1) % (menebotMessages.length || 1));
   };
 
@@ -90,6 +152,40 @@ function App() {
     if (isSleeping && isTalkBoxVisible) {
       setIsTalkBoxVisible(false);
       setCurrentMessageIndex(0);
+    }
+  };
+
+  // Determine if current message should show confirm buttons:
+  // show on the 3rd message (index 2) or on the last message of the current language array
+  const isConfirmIndex =
+    currentMessageIndex === 2 ||
+    currentMessageIndex === Math.max(0, menebotMessages.length - 1);
+
+  // Shared handlers for confirm buttons (Yes / No)
+  const handleConfirmYes = () => {
+    // trigger exit animation and scroll to chat section
+    setMenebotExiting(true);
+    const menebotSection = document.getElementById("chat-with-menebot-section");
+    if (menebotSection) {
+      menebotSection.scrollIntoView({ behavior: "smooth" });
+    }
+    // after short delay, stop exit animation and reset
+    setTimeout(() => {
+      setMenebotExiting(false);
+      setIsTalkBoxVisible(false);
+      setCurrentMessageIndex(0);
+    }, 900);
+  };
+
+  const handleConfirmNo = () => {
+    // If the confirm was shown on the last message, close and reset.
+    // Otherwise (e.g. the 3rd message), continue the flow to the next message.
+    const lastIdx = Math.max(0, menebotMessages.length - 1);
+    if (currentMessageIndex === lastIdx) {
+      setIsTalkBoxVisible(false);
+      setCurrentMessageIndex(0);
+    } else {
+      setCurrentMessageIndex((i) => Math.min(i + 1, lastIdx));
     }
   };
 
@@ -109,6 +205,7 @@ function App() {
 
       {/* Hero Section */}
       <main
+        id="home"
         className="min-h-screen pt-20 md:pt-32 lg:pt-64 pb-20 md:pb-32 relative z-10 px-6 sm:px-8 md:px-8 lg:px-12 xl:px-20 xl:w-full flex flex-col"
         onClick={handleClickOutside}
       >
@@ -133,7 +230,7 @@ function App() {
               />
 
               {/* container scrollDown */}
-              <div className="md:hidden w-full flex flex-col items-center gap-3 si-responsive-mt mb-20 z-0 pointer-events-auto ">
+              <div className="md:hidden w-full flex flex-col items-center gap-3 mt-28 sm:mt-60 mb-20 z-0 pointer-events-auto ">
                 <div className="flex flex-col items-center justify-center">
                   <img
                     src={scrollMouseIcon}
@@ -159,7 +256,7 @@ function App() {
               {/* Indicador de scroll - largescreens between 1024px and 1280px (lg only)
                 Em-fluxo (não absoluto), colocado antes do Menebot para garantir que o Menebot
                 fique abaixo e que exista espaçamento considerável entre os botões e o indicador. */}
-              <div className="hidden lg:flex xl:hidden w-full flex-col items-center gap-3 mt-12 mb-4 z-0 pointer-events-auto">
+              <div className="hidden lg:flex xl:hidden w-full flex-col items-center gap-3 lg:mt-24 lg:mb-80 z-0 pointer-events-auto">
                 <div className="flex flex-col items-center justify-center">
                   <img
                     src={scrollMouseIcon}
@@ -184,7 +281,7 @@ function App() {
 
               {/* Indicador de scroll - tablet/medium screens (>=768px and <1024px)
                 Visível apenas neste intervalo para manter a ordem: buttons -> scroll -> menebot */}
-              <div className="hidden md:flex lg:hidden w-full flex-col items-center gap-3 md:mt-[35px] mb-6 z-0 pointer-events-auto">
+              <div className="hidden md:flex lg:hidden w-full flex-col items-center gap-3 md:mt-48 md:mb-28 z-0 pointer-events-auto">
                 <div className="flex flex-col items-center justify-center">
                   <img
                     src={scrollMouseIcon}
@@ -209,7 +306,7 @@ function App() {
 
               {/* Menebot - Centralizado em mobile (<1280px), Lateral direita em desktop (>=1280px) */}
               <div
-                className="xl:hidden relative flex flex-col items-center justify-center mt-0 h-[500px] sm:h-[550px] md:h-[600px]"
+                className="xl:hidden relative flex flex-col items-center justify-center mt-60 sm:mt-0 h-[500px] sm:h-[550px] md:h-[600px]"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Container externo - Mobile/Tablet */}
@@ -223,9 +320,10 @@ function App() {
                         : "translateY(0)",
                     }}
                   >
-                    <div onClick={handleMenebotClick}>
+                      <div onClick={handleMenebotClick}>
                       <Menebot
                         className="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px] md:w-[250px] md:h-[250px]"
+                        isExiting={menebotExiting}
                         onSleepChange={handleMenebotSleep}
                       />
                     </div>
@@ -255,9 +353,15 @@ function App() {
                       </div>
                     ) : (
                       <TalkBox
+                        ref={talkBoxRef}
                         isVisible={isTalkBoxVisible}
                         message={menebotMessages[currentMessageIndex]}
                         onClick={handleTalkBoxClick}
+                        confirm={isConfirmIndex}
+                        yesLabel={translations[currentLanguage].talkboxYes}
+                        noLabel={translations[currentLanguage].talkboxNo}
+                        onYes={handleConfirmYes}
+                        onNo={handleConfirmNo}
                       />
                     )}
                   </div>
@@ -279,12 +383,13 @@ function App() {
                         : "translateY(0)",
                     }}
                   >
-                    <div
+                      <div
                       onClick={handleMenebotClick}
                       className="flex justify-end"
                     >
                       <Menebot
                         className="w-[260px] h-[260px]"
+                        isExiting={menebotExiting}
                         onSleepChange={handleMenebotSleep}
                       />
                     </div>
@@ -309,9 +414,15 @@ function App() {
                       </div>
                     ) : (
                       <TalkBox
+                        ref={talkBoxRef}
                         isVisible={isTalkBoxVisible}
                         message={menebotMessages[currentMessageIndex]}
                         onClick={handleTalkBoxClick}
+                        confirm={isConfirmIndex}
+                        yesLabel={translations[currentLanguage].talkboxYes}
+                        noLabel={translations[currentLanguage].talkboxNo}
+                        onYes={handleConfirmYes}
+                        onNo={handleConfirmNo}
                       />
                     )}
                   </div>
@@ -322,7 +433,7 @@ function App() {
         </div>
 
         {/* Indicador de scroll animado - apenas desktop >=1280px */}
-        <div className="hidden xl:flex absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-3 z-20">
+        <div className="hidden xl:flex absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-3 z-20 xl:mt-8">
           <img
             src={scrollMouseIcon}
             alt="Scroll para baixo"
@@ -344,29 +455,32 @@ function App() {
         </div>
       </main>
 
-      {/* About Section */}
-      <About language={currentLanguage} />
+  {/* About Section */}
+  <About language={currentLanguage} />
 
-      {/* My Story Section */}
-      <MyStory language={currentLanguage} />
+  {/* My Story Section */}
+  <MyStory language={currentLanguage} />
+
+    {/* Skills Section (moved below My Story) */}
+    <section id="habilidades">
+      <Skills language={currentLanguage} />
+    </section>
 
       {/* Chat with Menebot Section */}
       <section id="chat-with-menebot-section">
         <ChatWithMenebot language={currentLanguage} />
       </section>
 
-  {/* Footer */}
-  <Footer language={currentLanguage} />
 
-      {/* Section: Projetos e Tecnologias - left/right layout with external controls */}
-      <section>
-        <div className="w-full bg-black py-28 pl-6 sm:pl-8 md:pl-8 lg:pl-12 xl:pl-20 lg:px-0">
+  {/* Section: Projetos e Tecnologias - left/right layout with external controls */}
+  <section id="projetos">
+        <div className="w-full bg-black py-24 lg:py-36 pl-6 sm:pl-8 md:pl-8 lg:pl-12 xl:pl-20 lg:px-0">
           <div className="w-full flex flex-col md:flex-row gap-12 items-start">
             <div className="w-full flex flex-col md:flex-row gap-8">
               {/* LEFT: info */}
               <div className="flex-1 lg:w-[50%] flex flex-col">
                   <div className="mb-8 flex flex-col items-center md:items-start pr-6 md:pr-0">
-                    <h2 className="text-5xl md:text-7xl font-extrabold text-white mb-4">
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4 text-[var(--color-primary)] font-['Montserrat',sans-serif]">
                       {translations[currentLanguage].projects.title}
                     </h2>
                     <p
@@ -379,7 +493,7 @@ function App() {
 
                 <div className="flex flex-col gap-4 w-full justify-center items-center md:justify-start md:items-start pr-6 md:pr-0">
                   <div className="w-full flex justify-center md:justify-start">
-                    <h3 className="text-3xl md:text-4xl text-center md:text-left font-extrabold text-white mb-4">
+                    <h3 className="text-3xl md:text-4xl font-extrabold text-center md:text-left mb-4 text-[var(--color-primary)] font-['Montserrat',sans-serif]">
                       {translations[currentLanguage].projects.techsTitle}
                     </h3>
                   </div>
@@ -521,14 +635,14 @@ function App() {
 
             <div className="flex flex-row gap-4 md:pr-8 lg:pr-0">
                 <button
-                onClick={() => carouselRef.current?.scrollLeft()}
+                onClick={() => { if (carouselRef.current && carouselRef.current.scrollLeft) { carouselRef.current.scrollLeft(); } }}
                 className="min-w-[120px] sm:min-w-[180px] flex-1 px-6 md:px-8 py-3 sm:py-3.5 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-semibold text-sm sm:text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap"
               >
                 {translations[currentLanguage].projects.prev}
               </button>
 
                 <button
-                onClick={() => carouselRef.current?.scrollRight()}
+                onClick={() => { if (carouselRef.current && carouselRef.current.scrollRight) { carouselRef.current.scrollRight(); } }}
                 className="min-w-[120px] sm:min-w-[180px] flex-1 px-6 md:px-8 py-3 sm:py-3.5 bg-[var(--color-primary)] text-white font-semibold text-sm sm:text-base rounded-full hover:bg-[var(--color-primary-light)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.6)] transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 {translations[currentLanguage].projects.next}
@@ -538,44 +652,31 @@ function App() {
         </div>
       </section>
 
-      {/* Contact section: explicit left (form) and right (text) columns. Mobile stacks with text above form */}
-      <section className="w-full bg-black py-24 md:py-28 px-6 sm:px-8 md:px-8 lg:px-12 xl:px-20">
+  {/* Contact section: explicit left (form) and right (text) columns. Mobile stacks with text above form */}
+  <section id="contato" className="w-full bg-black py-30 px-6 sm:px-8 md:px-8 lg:px-12 xl:px-20">
         <div className="mx-auto w-full">
           <div className="w-full flex flex-col md:flex-row items-stretch justify-between">
             {/* LEFT - Form (md: left) */}
             <div className="w-full md:w-1/2 order-2 md:order-1 flex">
               <div className="w-full">
-                <form className="w-full bg-transparent">
-                  <div className="flex flex-col gap-6">
-                    <input placeholder="Nome" aria-label="Nome" className="w-full bg-[#1f1f1f] placeholder-gray-500 text-gray-200 rounded-2xl px-6 py-4 shadow-md ring-1 ring-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40" />
-                    <input placeholder="E-mail" aria-label="E-mail" className="w-full bg-[#1f1f1f] placeholder-gray-500 text-gray-200 rounded-2xl px-6 py-4 shadow-md ring-1 ring-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40" />
-
-                    {/* two small fields side-by-side at md and up */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <input placeholder="Telefone" aria-label="Telefone" className="w-full bg-[#1f1f1f] placeholder-gray-500 text-gray-200 rounded-2xl px-6 py-4 shadow-md ring-1 ring-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40" />
-                      <input placeholder="Assunto" aria-label="Assunto" className="w-full bg-[#1f1f1f] placeholder-gray-500 text-gray-200 rounded-2xl px-6 py-4 shadow-md ring-1 ring-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40" />
-                    </div>
-
-                    <textarea placeholder="Mensagem" aria-label="Mensagem" rows={6} className="w-full bg-[#1f1f1f] placeholder-gray-500 text-gray-200 rounded-2xl px-6 py-4 shadow-md ring-1 ring-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 resize-none" />
-
-                    <div className="w-full">
-                      <button type="submit" className="w-full bg-gradient-to-r from-[#7D44FF] to-[#B321FA] text-white py-4 rounded-2xl font-semibold hover:brightness-105 transition">Enviar</button>
-                    </div>
-                  </div>
-                </form>
+                <form className="w-full bg-transparent" onSubmit={(e) => e.preventDefault()}>
+                  <ContactForm currentLanguage={currentLanguage} />
+              </form>
               </div>
             </div>
 
             {/* RIGHT - Text content (md: right) */}
             <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-end items-start">
               <div className="w-full text-right md:pl-8 lg:pl-16">
-                <h3 className="text-[56px] text-center md:text-right md:text-[96px] leading-tight font-extrabold text-white mb-4">Fale comigo</h3>
-                <div className="mb-4 text-lg md:text-4xl text-gray-200 text-center md:text-right font-semibold">bora trabalhar <span style={{background: 'radial-gradient(circle, #E204F5 0%, #CC12F7 22%, #B321FA 46%, #9733FC 74%, #7D44FF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'}} className="text-transparent font-extrabold">juntos?</span></div>
+                <h3 className="text-[56px] text-center md:text-right md:text-[96px] leading-tight font-extrabold text-white mb-4">{translations[currentLanguage].contact.heading}</h3>
+                <div className="mb-4 text-lg md:text-4xl text-gray-200 text-center md:text-right font-semibold">{contactPrefix} <span style={{background: 'radial-gradient(circle, #E204F5 0%, #CC12F7 22%, #B321FA 46%, #9733FC 74%, #7D44FF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'}} className="text-transparent font-extrabold">{contactSuffix}</span></div>
               </div>
             </div>
           </div>
         </div>
       </section>
+      {/* Footer */}
+      <Footer language={currentLanguage} />
     </div>
   );
 }

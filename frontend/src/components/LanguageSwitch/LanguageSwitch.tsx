@@ -29,7 +29,7 @@ export function LanguageSwitch({ isOpen, selectedLanguage, onLanguageChange, onC
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       const clickedInsideDropdown = dropdownRef.current && dropdownRef.current.contains(target);
-      const clickedOnAnchor = anchorRef?.current && anchorRef.current.contains(target);
+      const clickedOnAnchor = anchorRef && anchorRef.current && anchorRef.current.contains(target);
 
       if (!clickedInsideDropdown && !clickedOnAnchor) {
         onClose();

@@ -10,20 +10,26 @@ export const PolaroidCarousel: React.FC<PolaroidCarouselProps> = ({ images, alt 
   const [isHovering, setIsHovering] = useState(false);
 
   const nextImage = (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    e?.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    e?.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   const goToImage = (index: number, e?: React.MouseEvent) => {
-    e?.preventDefault();
-    e?.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setCurrentImageIndex(index);
   };
 

@@ -1,7 +1,6 @@
 import React from "react";
 import { translations } from "../../i18n";
-import linkedinIcon from "../../assets/icons/icons8-aws.svg"; // placeholder - reuse an icon available
-import twitterIcon from "../../assets/icons/icons8-js.svg"; // placeholder
+import { FaWhatsapp, FaGithub, FaLinkedin } from 'react-icons/fa';
 
 type Props = {
   language?: "pt" | "en" | "es";
@@ -16,11 +15,11 @@ export const Footer: React.FC<Props> = ({ language = "pt" }) => {
 
   return (
     <footer className="w-full bg-gradient-to-br from-[#07060a] via-[#0b0710] to-[#07060a] text-white mt-12">
-      <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 py-16">
+      <div className="mx-auto w-full bg-black py-24 md:py-28 px-6 sm:px-8 md:px-8 lg:px-12 xl:px-20">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div className="flex-1">
             <h4 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">
-              <span className="block text-white">{t.titleLine1}</span>
+              <span className="block text-3xl md:text-4xl font-extrabold text-left sm:**:mb-6 text-[var(--color-primary)] font-['Montserrat',sans-serif]">{t.titleLine1}</span>
               <span className="block text-transparent bg-gradient-radial from-[#E204F5] via-[#CC12F7] to-[#7D44FF] bg-clip-text font-black text-4xl md:text-5xl">
                 {t.titleLine2}
               </span>
@@ -29,49 +28,40 @@ export const Footer: React.FC<Props> = ({ language = "pt" }) => {
               {t.description}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href="/" className="text-sm text-white/80 hover:text-white inline-flex items-center gap-2">
+              <a href="#projects" className="text-sm text-white/80 hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2">
                 {t.linkPortfolio}
               </a>
-              <a href="/" className="text-sm text-white/80 hover:text-white inline-flex items-center gap-2">
+
+              {/* Resume download - expects /resume.pdf to be placed in public/ */}
+              <a href="/resume.pdf" download className="text-sm text-white/80 hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2" aria-label="Download CV">
                 {t.linkResume}
               </a>
-              <a href="mailto:contato@exemplo.com" className="text-sm text-white/80 hover:text-white inline-flex items-center gap-2">
+
+              {/* WhatsApp contact link */}
+              <a href="https://wa.me/5511946706513?text=Ol%C3%A1%20Ruy!%20Vim%20pelo%20seu%20portf%C3%B3lio%2C%20vamos%20conversar%3F" target="_blank" rel="noreferrer" className="text-sm text-white/80 hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2" aria-label="WhatsApp">
                 {t.linkContact}
               </a>
             </div>
           </div>
 
           <div className="flex flex-col items-start md:items-end gap-6">
-            <div className="flex items-center gap-3">
-              <a
-                href="https://github.com/RuyBarbosa22"
-                target="_blank"
-                rel="noreferrer"
-                className="w-11 h-11 rounded-lg bg-[#131217] flex items-center justify-center hover:scale-105 transition-transform"
-                aria-label="GitHub"
-              >
-                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1-.02-1.96-3.2.7-3.88-1.54-3.88-1.54-.53-1.36-1.3-1.72-1.3-1.72-1.06-.73.08-.72.08-.72 1.17.08 1.79 1.2 1.79 1.2 1.04 1.78 2.73 1.26 3.4.96.11-.75.41-1.26.74-1.55-2.55-.29-5.23-1.28-5.23-5.71 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18.92-.26 1.9-.39 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.81 1.19 1.84 1.19 3.1 0 4.44-2.69 5.41-5.25 5.7.42.36.79 1.09.79 2.2 0 1.59-.01 2.87-.01 3.26 0 .3.21.67.8.55C20.71 21.39 24 17.08 24 12c0-6.27-5.23-11.5-12-11.5z"/></svg>
-              </a>
-
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-11 h-11 rounded-lg bg-[#131217] flex items-center justify-center hover:scale-105 transition-transform"
-                aria-label="LinkedIn"
-              >
-                <img src={linkedinIcon} alt="LinkedIn" className="w-5 h-5" />
-              </a>
-
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-11 h-11 rounded-lg bg-[#131217] flex items-center justify-center hover:scale-105 transition-transform"
-                aria-label="Twitter"
-              >
-                <img src={twitterIcon} alt="Twitter" className="w-5 h-5" />
-              </a>
+            <div className="flex items-center gap-3 bg-black/40 border border-[var(--color-primary)]/20 px-3 py-2.5 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)]">
+              {[
+                { icon: FaWhatsapp, label: 'WhatsApp', href: 'https://wa.me/5511946706513?text=Ol%C3%A1%20Ruy!%20Vim%20pelo%20seu%20portf%C3%B3lio%2C%20vamos%20conversar%3F' },
+                { icon: FaLinkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/ruy-barbosa/' },
+                { icon: FaGithub, label: 'GitHub', href: 'https://github.com/RuyBarbosa22' },
+              ].map(({ icon: Icon, label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className="inline-flex items-center justify-center p-1.5 rounded-full text-[var(--color-primary)] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-0.5 hover:text-[var(--color-primary-lighter)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)]"
+                >
+                  <Icon size={19} />
+                </a>
+              ))}
             </div>
 
             <div className="flex items-center gap-3">

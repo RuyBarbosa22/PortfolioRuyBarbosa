@@ -51,7 +51,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
   return (
     <section 
       id="historia"
-      className="relative w-full bg-black py-20 md:py-32 lg:py-40"
+      className="relative w-full bg-black py-24 lg:py-40"
     >
       <div className="px-6 sm:px-8 md:px-8 lg:px-12 xl:px-20">
         {/* Layout Mobile: Grid 1 coluna */}
@@ -66,7 +66,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
           {/* Em XL, usa flex-col com justify-end para alinhar stats ao bottom */}
           <div className="w-full md:w-[60%] text-white xl:flex xl:flex-col xl:justify-end">
             <div className="xl:mb-auto">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-[var(--color-primary)]">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-center md:text-left mb-4 text-[var(--color-primary)] font-['Montserrat',sans-serif]">
                 {content.title}
               </h2>
               <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-8 text-justify">

@@ -5,6 +5,9 @@ import cors from 'cors';
 import { config } from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { Readable } from 'stream';
 import { tryIntentMatch } from './services/intent-matcher.js';
@@ -51,6 +54,12 @@ const GENERATION_MODEL = process.env.BEDROCK_GENERATION_MODEL || 'us.meta.llama3
 // Clients AWS
 const s3Client = new S3Client({ region: AWS_REGION });
 const bedrockClient = new BedrockRuntimeClient({ region: AWS_REGION });
+const sesClient = new SESClient({ region: AWS_REGION });
+const ddbClient = new DynamoDBClient({ region: AWS_REGION });
+
+// DynamoDB table name (store user verification + emails)
+const DDB_TABLE = process.env.DDB_TABLE_NAME || 'menebot_users';
+const SES_FROM_EMAIL = process.env.SES_FROM_EMAIL || `no-reply@${process.env.FRONTEND_URL?.replace(/https?:\/\//,'') || 'example.com'}`;
 
 // Cache de embeddings em memória
 let embeddingsCache: Chunk[] = [];
@@ -371,6 +380,172 @@ async function startServer() {
     });
   });
 
+  // Request verification code (step 1)
+  app.post('/api/auth/request-code', async (req, res) => {
+    try {
+      const { email } = req.body || {};
+      if (!email || typeof email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        return res.status(400).json({ message: 'Invalid email' });
+      }
+
+      // Basic rate-limiting per email: check existing item
+      const getCmd = new GetItemCommand({ TableName: DDB_TABLE, Key: marshall({ email }) });
+      const existing = await ddbClient.send(getCmd);
+      const now = Date.now();
+      if (existing && existing.Item) {
+        const item = unmarshall(existing.Item as any) as any;
+        if (item.lastSentAt && now - item.lastSentAt < 60_000) {
+          return res.status(429).json({ message: 'Too many requests, try again later' });
+        }
+      }
+
+      // generate 6-digit numeric code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = now + 5 * 60 * 1000; // 5 minutes
+
+      // Store/update item in DynamoDB
+      const put = new PutItemCommand({
+        TableName: DDB_TABLE,
+        Item: marshall({
+          email,
+          code,
+          codeExpiresAt: expiresAt,
+          verified: false,
+          createdAt: existing && existing.Item ? unmarshall(existing.Item as any).createdAt : now,
+          lastSentAt: now,
+        }),
+      });
+
+      await ddbClient.send(put);
+
+      // Send email via SES
+      const bodyText = `Seu código de verificação Menebot é: ${code}\n\nEste código expira em 5 minutos.`;
+      const sendCmd = new SendEmailCommand({
+        Source: SES_FROM_EMAIL,
+        Destination: { ToAddresses: [email] },
+        Message: {
+          Subject: { Data: 'Seu código de verificação' },
+          Body: { Text: { Data: bodyText } },
+        },
+      });
+
+      await sesClient.send(sendCmd);
+
+      return res.json({ ok: true });
+    } catch (error) {
+      console.error('Error sending verification code', error);
+      return res.status(500).json({ message: 'Could not send code' });
+    }
+  });
+
+  // Verify code (step 2)
+  app.post('/api/auth/verify-code', async (req, res) => {
+    try {
+      const { email, code } = req.body || {};
+      if (!email || !code) return res.status(400).json({ message: 'Missing email or code' });
+
+      const getCmd = new GetItemCommand({ TableName: DDB_TABLE, Key: marshall({ email }) });
+      const existing = await ddbClient.send(getCmd);
+      if (!existing || !existing.Item) return res.status(400).json({ message: 'No code requested for this email' });
+
+      const item = unmarshall(existing.Item as any) as any;
+      const now = Date.now();
+      if (!item.code || !item.codeExpiresAt || now > item.codeExpiresAt) {
+        return res.status(400).json({ message: 'Code expired or not found' });
+      }
+
+      if (item.code !== String(code)) {
+        return res.status(400).json({ message: 'Invalid code' });
+      }
+
+      // mark verified: set verified and verifiedAt, remove code and codeExpiresAt
+      const updateCmd = new UpdateItemCommand({
+        TableName: DDB_TABLE,
+        Key: marshall({ email }),
+        UpdateExpression: 'SET verified = :v, verifiedAt = :ts REMOVE code, codeExpiresAt',
+        ExpressionAttributeValues: marshall({ ':v': true, ':ts': now }),
+      });
+      await ddbClient.send(updateCmd);
+
+      return res.json({ ok: true });
+    } catch (error) {
+      console.error('Error verifying code', error);
+      return res.status(500).json({ message: 'Verification failed' });
+    }
+  });
+
+  // Session start: increments accessCount and records current session start
+  app.post('/api/auth/session-start', async (req, res) => {
+    try {
+      const { email } = req.body || {};
+      if (!email || typeof email !== 'string') return res.status(400).json({ message: 'Missing email' });
+
+      const sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`;
+      const now = Date.now();
+
+      // Update item: set lastAccessAt, currentSessionId/start, increment accessCount
+      const updateParams = new UpdateItemCommand({
+        TableName: DDB_TABLE,
+        Key: marshall({ email }),
+        UpdateExpression: 'SET lastAccessAt = :now, currentSessionId = :sid, currentSessionStart = :now REMOVE code, codeExpiresAt, verifiedAt',
+        ExpressionAttributeValues: marshall({ ':now': now, ':sid': sessionId }),
+      });
+
+      // Also ADD accessCount :inc (use a separate call because UpdateExpression can combine)
+      // DynamoDB supports ADD in the same operation, but marshall will handle values; we'll perform another update with ADD to increment safely
+      await ddbClient.send(updateParams);
+
+      // increment accessCount (ADD)
+      const addParams = new UpdateItemCommand({
+        TableName: DDB_TABLE,
+        Key: marshall({ email }),
+        UpdateExpression: 'ADD accessCount :inc',
+        ExpressionAttributeValues: marshall({ ':inc': 1 }),
+      });
+      await ddbClient.send(addParams);
+
+      return res.json({ ok: true, sessionId });
+    } catch (error) {
+      console.error('Error starting session', error);
+      return res.status(500).json({ message: 'Could not start session' });
+    }
+  });
+
+  // Session end: calculate duration and add to totalTime
+  app.post('/api/auth/session-end', async (req, res) => {
+    try {
+      const { email, sessionId } = req.body || {};
+      if (!email || !sessionId) return res.status(400).json({ message: 'Missing email or sessionId' });
+
+      // Get current item
+      const getCmd = new GetItemCommand({ TableName: DDB_TABLE, Key: marshall({ email }) });
+      const existing = await ddbClient.send(getCmd);
+      if (!existing || !existing.Item) return res.status(400).json({ message: 'No session found' });
+
+      const item = unmarshall(existing.Item as any) as any;
+      if (!item.currentSessionId || item.currentSessionId !== sessionId || !item.currentSessionStart) {
+        return res.status(400).json({ message: 'Session mismatch or already closed' });
+      }
+
+      const now = Date.now();
+      const duration = now - item.currentSessionStart; // ms
+
+      // Update: add duration to totalTime (ADD), remove currentSessionId/currentSessionStart
+      const updateCmd = new UpdateItemCommand({
+        TableName: DDB_TABLE,
+        Key: marshall({ email }),
+        UpdateExpression: 'SET updatedAt = :now REMOVE currentSessionId, currentSessionStart ADD totalTime :dur',
+        ExpressionAttributeValues: marshall({ ':now': now, ':dur': duration }),
+      });
+      await ddbClient.send(updateCmd);
+
+      return res.json({ ok: true, duration });
+    } catch (error) {
+      console.error('Error ending session', error);
+      return res.status(500).json({ message: 'Could not end session' });
+    }
+  });
+
   // Socket.io - Apenas localhost
   const io = new Server(httpServer, {
     cors: {
@@ -397,6 +572,21 @@ async function startServer() {
         // Validação
         if (!data.message || !data.email) {
           socket.emit('error', { message: 'Mensagem e email são obrigatórios.' });
+          return;
+        }
+
+        // Check whether email is verified (must complete two-step verification)
+        try {
+          const vCmd = new GetItemCommand({ TableName: DDB_TABLE, Key: marshall({ email: data.email }) });
+          const vRes = await ddbClient.send(vCmd);
+          const vItem = vRes && vRes.Item ? unmarshall(vRes.Item as any) as any : null;
+          if (!vItem || !vItem.verified) {
+            socket.emit('error', { message: 'Email not verified. Please request a code and verify before using Menebot.' });
+            return;
+          }
+        } catch (e) {
+          console.error('Error checking verification', e);
+          socket.emit('error', { message: 'Verification check failed. Try again later.' });
           return;
         }
 

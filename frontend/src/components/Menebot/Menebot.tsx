@@ -9,9 +9,10 @@ import closedEyeSvg from '../../assets/icons/menebot-closed-eye.svg';
 interface MenebotProps {
   className?: string;
   onSleepChange?: (isSleeping: boolean) => void;
+  isExiting?: boolean;
 }
 
-export function Menebot({ className = '', onSleepChange }: MenebotProps) {
+export function Menebot({ className = '', onSleepChange, isExiting = false }: MenebotProps) {
   const [eyePosition, setEyePosition] = useState({ x: 0, y: 0 });
   const [isBlinking, setIsBlinking] = useState(false);
   const [isFlapping, setIsFlapping] = useState(false);
@@ -144,6 +145,12 @@ export function Menebot({ className = '', onSleepChange }: MenebotProps) {
     <div 
       ref={containerRef}
       className={`relative ${className}`}
+      style={{
+        transition: 'transform 600ms cubic-bezier(.2,.9,.3,1), opacity 400ms ease',
+        transform: isExiting ? 'translateY(-140px) scale(0.92)' : undefined,
+        opacity: isExiting ? 0.0 : 1,
+        pointerEvents: isExiting ? 'none' : undefined,
+      }}
     >
       {/* Animação de Zs quando dormindo */}
       {isSleeping && (

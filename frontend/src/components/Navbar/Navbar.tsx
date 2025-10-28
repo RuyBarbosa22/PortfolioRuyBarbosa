@@ -14,12 +14,19 @@ interface NavbarProps {
 }
 
 export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
+  // Sections order must match the labels in translations.nav exactly.
+  // Desired order: home, sobre, habilidades, menebot, projetos, contato
+  const sectionIds = ['home','sobre','habilidades','chat-with-menebot-section','projetos','contato'];
+  // Buffer in pixels used to decide when the section top is considered "under" the header.
+  // Increase this to switch the active nav a bit earlier, decrease to switch later.
+  const SECTION_SWITCH_BUFFER = 0; // tweak this value as desired (was 4/8 previously)
   const [activeLink, setActiveLink] = useState(translations[selectedLanguage].nav[0]);
-  const navLinks: { name: string; href: string }[] = translations[selectedLanguage].nav.map((name: string) => ({ name, href: '#' }));
+  const navLinks: { name: string; href: string; id: string }[] = translations[selectedLanguage].nav.map((name: string, idx: number) => ({ name, href: `#${sectionIds[idx]}`, id: sectionIds[idx] }));
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const languageToggleRef = useRef<HTMLButtonElement>(null);
+  // (underline removed per preference)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,6 +36,75 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Scroll spy: switch active item when a section's top crosses the header top (stable and predictable)
+  useEffect(() => {
+    // We'll locate the section that contains the point just under the header (offset),
+    // which reliably identifies which section the user is 'in' regardless of viewport size.
+    const ids = sectionIds;
+
+    const getSections = () => ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    let ticking = false;
+
+    const updateActive = () => {
+      const sections = getSections();
+      if (sections.length === 0) return;
+
+      const header = document.querySelector('header') as HTMLElement | null;
+      const headerHeight = header?.offsetHeight ?? 0;
+      const offset = headerHeight + SECTION_SWITCH_BUFFER;
+
+      // Prefer the section that contains the offset (top <= offset < bottom)
+      let found = -1;
+      for (let i = 0; i < sections.length; i++) {
+        const rect = sections[i].getBoundingClientRect();
+        if (rect.top <= offset && rect.bottom > offset) {
+          found = i;
+          break;
+        }
+      }
+
+      // Fallback: if none contains the offset (e.g., scrolled past last), pick the closest by distance to offset
+      if (found === -1) {
+        let best = 0;
+        let bestDist = Infinity;
+        for (let i = 0; i < sections.length; i++) {
+          const rect = sections[i].getBoundingClientRect();
+          const dist = Math.abs(rect.top - offset);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = i;
+          }
+        }
+        found = best;
+      }
+
+      const newLabel = translations[selectedLanguage].nav[found];
+  setActiveLink((prev: string) => (prev === newLabel ? prev : newLabel));
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateActive();
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+
+    // initialize once
+    updateActive();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [selectedLanguage]);
+
+  // (animated underline removed)
 
   // Keep "first" nav item selected when language changes while we're at the top
   useEffect(() => {
@@ -96,6 +172,10 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
                   e.preventDefault();
                   setActiveLink(link.name);
                   setIsMobileMenuOpen(false);
+                  const el = document.getElementById(link.id);
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
                 }}
                 className={`
                   px-4 py-3 rounded-lg font-[var(--font-montserrat)] text-base font-medium
@@ -160,7 +240,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
           </div>
         </div>
 
-        {/* Center links - Desktop Only */}
+        {/* Center links - Desktop Only (with animated sliding underline) */}
         <div className="hidden lg:flex gap-1.5 items-center bg-black/40 border border-[var(--color-primary)]/20 px-2.5 py-[0.45rem] rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)] justify-self-center">
           {navLinks.map((link) => (
             <a
@@ -169,6 +249,8 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
               onClick={(e) => {
                 e.preventDefault();
                 setActiveLink(link.name);
+                const el = document.getElementById(link.id);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
               className={`
                 inline-block px-[1.4rem] py-[0.65rem] rounded-full 

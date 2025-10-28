@@ -14,19 +14,15 @@ interface ChatWithMenebotProps {
 
 // Posições dos Menebots - simétricos e bem espaçados
   const menebotPositions = [
-  // Top Menebots - symmetric
   { image: menebotFrente, top: '15%', left: '8%', xlLeft: '4%' },
   { image: menebotDireita, top: '15%', right: '8%', xlRight: '4%' },
     
-  // Middle Menebots - symmetric
   { image: menebotEsquerda, top: '42%', left: '10%', xlLeft: '6%' },
   { image: menebotOlhoFechado, top: '42%', right: '10%', xlRight: '6%' },
     
-  // Lower lateral Menebots - symmetric
   { image: menebotFrente, top: '68%', left: '8%', xlLeft: '4%' },
   { image: menebotPiscando, top: '68%', right: '8%', xlRight: '4%' },
     
-  // Menebots entre botão e laterais, alinhados verticalmente
   { image: menebotCima, bottom: '16%', left: '32%', xlLeft: '24%' },
   { image: menebotBaixo, bottom: '16%', right: '32%', xlRight: '24%' },
   ];
@@ -38,13 +34,18 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   const [isValidated, setIsValidated] = useState(false);
   const [showCheckAnimation, setShowCheckAnimation] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  // const [isTransitioning, setIsTransitioning] = useState(false); // unused - removed
   const [savedEmail, setSavedEmail] = useState(''); // Email salvo para o chat
+  const [step, setStep] = useState<'enter-email'|'enter-code'>('enter-email');
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const contentByLang: Record<string, { title: string; description: string; buttonText: string; modalTitle: string; modalDescription: string; modalButton: string; invalidEmail: string; successMessage: string; chatButton: string }> = {
     pt: {
       title: 'Fale com o menebot!',
-      description: 'Criei um chatbot super bacana para o meu portfólio, usando a API da OpenAI e muita programação em Python. Ele acessa um PDF cheio de informações sobre mim e está pronto para responder suas perguntas sobre minhas habilidades e experiências. Quer saber mais sobre meu trabalho de um jeito divertido e interativo? Converse com o bot e descubra como minhas competências podem brilhar em diferentes contextos profissionais! Vai lá, experimente e se surpreenda!',
+      description: 'Criei um chatbot super bacana para o meu portfólio, usando os serviços da AWS e muita programação em Typescript. Ele acessa um PDF cheio de informações sobre mim e está pronto para responder suas perguntas sobre minhas habilidades e experiências. Quer saber mais sobre meu trabalho de um jeito divertido e interativo? Converse com o Menebot e descubra como minhas competências podem brilhar em diferentes contextos profissionais! Vai lá, experimente e se surpreenda!',
       buttonText: 'Falar com menebot',
       modalTitle: 'Me deixe saber quem é você',
       modalDescription: 'Digite seu email abaixo',
@@ -54,26 +55,26 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       chatButton: 'Conversar com menebot'
     },
     en: {
-      title: 'Chat with menebot!',
-      description: "I created a super cool chatbot for my portfolio, using OpenAI's API and lots of Python programming. It accesses a PDF full of information about me and is ready to answer your questions about my skills and experiences. Want to learn more about my work in a fun and interactive way? Chat with the bot and discover how my skills can shine in different professional contexts! Go ahead, try it and be amazed!",
-      buttonText: 'Chat with menebot',
-      modalTitle: 'Let me know who you are',
-      modalDescription: 'Enter your email below',
+      title: 'Chat with Menebot!',
+      description: 'I built a fun and smart chatbot for my portfolio using AWS services and plenty of TypeScript. It connects to a PDF packed with details about me and can answer your questions about my skills, experience, and projects. Want to explore my work in a fun, interactive way? Talk to Menebot and see how my abilities can make an impact in different professional settings! Give it a try — you might be surprised!',
+      buttonText: 'Chat with Menebot',
+      modalTitle: 'Tell me who you are',
+      modalDescription: 'Type your email below',
       modalButton: 'Continue',
       invalidEmail: 'Invalid email. Please check and try again.',
       successMessage: 'You can now test this feature',
-      chatButton: 'Chat with menebot'
+      chatButton: 'Start chatting with Menebot'
     },
     es: {
-      title: '¡Habla con menebot!',
-      description: '¡Creé un chatbot súper genial para mi portafolio, usando la API de OpenAI y mucha programación en Python! Accede a un PDF lleno de información sobre mí y está listo para responder tus preguntas sobre mis habilidades y experiencias. ¿Quieres saber más sobre mi trabajo de una manera divertida e interactiva? ¡Conversa con el bot y descubre cómo mis competencias pueden brillar en diferentes contextos profesionales! ¡Vamos, pruébalo y sorpréndete!',
-      buttonText: 'Hablar con menebot',
-      modalTitle: 'Déjame saber quién eres',
-      modalDescription: 'Ingresa tu email abajo',
+      title: '¡Chatea con Menebot!',
+      description: 'Desarrollé un chatbot divertido e inteligente para mi portafolio usando los servicios de AWS y mucha programación en TypeScript. Se conecta a un PDF lleno de información sobre mí y está listo para responder tus preguntas sobre mis habilidades, experiencias y proyectos. ¿Quieres conocer mi trabajo de una forma entretenida e interactiva? ¡Habla con Menebot y descubre cómo mis capacidades pueden destacar en distintos entornos profesionales! ¡Anímate a probarlo y déjate sorprender!',
+      buttonText: 'Chatear con Menebot',
+      modalTitle: 'Cuéntame quién eres',
+      modalDescription: 'Escribe tu correo electrónico abajo',
       modalButton: 'Continuar',
-      invalidEmail: 'Email inválido. Por favor, verifica e intenta nuevamente.',
-      successMessage: 'Ya puedes probar esta funcionalidad',
-      chatButton: 'Conversar con menebot'
+      invalidEmail: 'Correo electrónico no válido. Por favor, verifica e inténtalo de nuevo.',
+      successMessage: 'Ya puedes probar esta función',
+      chatButton: 'Empezar a chatear con Menebot'
     }
   };
 
@@ -86,17 +87,37 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
 
   const handleProceed = () => {
     setEmailError('');
-    
+    setCodeError('');
+
     if (!validateEmail(email)) {
       setEmailError(content.invalidEmail);
       return;
     }
 
-    // Email válido - mostrar animação de check
-    setShowCheckAnimation(true);
-    setTimeout(() => {
-      setIsValidated(true);
-    }, 500);
+    // Request verification code from backend
+    setIsLoading(true);
+    fetch(`${API_BASE}/api/auth/request-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+      .then(async (res) => {
+        setIsLoading(false);
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          setEmailError(j.message || 'Erro ao enviar código');
+          return;
+        }
+        // move to code entry step
+        setStep('enter-code');
+      })
+      .catch((err) => {
+        console.error(err);
+        setIsLoading(false);
+        setEmailError('Erro de rede. Tente novamente.');
+      });
+      ;
+
   };
 
   const handleOpenModal = () => {
@@ -115,24 +136,57 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
     setShowCheckAnimation(false);
   };
 
-  const handleChatWithMenebot = () => {
-    setSavedEmail(email); // Salva o email antes de fechar o modal
-    setTimeout(() => {
-      setShowChat(true);
-      handleCloseModal();
-      // transition state removed
-    }, 300);
+  const handleChatWithMenebot = async () => {
+    // Start session with backend
+    try {
+      setIsLoading(true);
+      const res = await fetch(`${API_BASE}/api/auth/session-start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      setIsLoading(false);
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        setEmailError(j.message || 'Erro ao iniciar sessão');
+        return;
+      }
+      const json = await res.json();
+      const sid = json.sessionId as string | undefined;
+      setSessionId(sid || null);
+      setSavedEmail(email);
+      setTimeout(() => {
+        setShowChat(true);
+        handleCloseModal();
+      }, 300);
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+      setEmailError('Erro de rede ao iniciar sessão');
+    }
   };
 
   const handleCloseChat = () => {
-    setTimeout(() => {
+    setTimeout(async () => {
+      // End session if exists
+      try {
+        if (sessionId) {
+          await fetch(`${API_BASE}/api/auth/session-end`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: savedEmail, sessionId }),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to end session', e);
+      }
       setShowChat(false);
-      // transition state removed
+      setSessionId(null);
     }, 300);
   };
 
   return (
-    <section className="relative w-full bg-black py-32 md:py-48 lg:py-60 overflow-hidden min-h-screen">
+    <section className="relative w-full bg-black py-24 md:py-48 lg:py-60 overflow-hidden min-h-screen">
       {/* Conteúdo da section com fade out durante transição */}
       <div 
         className={`transition-opacity duration-500 ${showChat ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -183,7 +237,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
         <div className="relative z-10 max-w-[900px] mx-auto px-6 sm:px-8 md:px-8 lg:px-12">
           {/* Título com Menebots nas laterais */}
           <div className="flex items-center justify-center gap-4 mb-8">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white text-center">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4 text-[var(--color-primary)] font-['Montserrat',sans-serif]">
               {content.title}
             </h2>
           </div>
@@ -237,7 +291,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
             className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl p-8 max-w-md w-full shadow-2xl shadow-purple-500/20"
             onClick={(e) => e.stopPropagation()}
           >
-            {!isValidated ? (
+            {step === 'enter-email' && !isValidated ? (
               <>
                 {/* Título */}
                 <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2 text-center">
@@ -269,12 +323,13 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                 {/* Botão Prosseguir */}
                 <button
                   onClick={handleProceed}
-                  className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-4"
+                  disabled={isLoading}
+                  className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-4 disabled:opacity-60"
                 >
-                  {content.modalButton}
+                  {isLoading ? 'Enviando...' : content.modalButton}
                 </button>
               </>
-            ) : (
+            ) : step === 'enter-code' && !isValidated ? (
               <>
                 {/* Animação de Check */}
                 {showCheckAnimation && (
@@ -287,18 +342,105 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                   </div>
                 )}
 
-                {/* Mensagem de Sucesso */}
-                <p className="text-lg text-white font-['Roboto_Mono',monospace] mb-6 text-center">
-                  {content.successMessage}
-                </p>
+                {/* Enter verification code */}
+                <h4 className="text-white font-semibold text-center mb-3">Verifique seu e-mail</h4>
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Código de 6 dígitos"
+                  className="w-full px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors mb-2 text-center"
+                />
+                {codeError && <p className="text-red-400 text-sm mb-2 text-center">{codeError}</p>}
 
-                {/* Botão Conversar */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={async () => {
+                      setCodeError('');
+                      if (!code || code.trim().length < 4) {
+                        setCodeError('Código inválido');
+                        return;
+                      }
+                      setIsLoading(true);
+                      try {
+                        const res = await fetch(`${API_BASE}/api/auth/verify-code`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ email, code }),
+                        });
+                        setIsLoading(false);
+                        if (!res.ok) {
+                          const j = await res.json().catch(() => ({}));
+                          setCodeError(j.message || 'Falha ao verificar código');
+                          return;
+                        }
+                        setShowCheckAnimation(true);
+                        setTimeout(() => setIsValidated(true), 400);
+                      } catch (err) {
+                        console.error(err);
+                        setIsLoading(false);
+                        setCodeError('Erro de rede. Tente novamente.');
+                      }
+                    }}
+                    className="flex-1 bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg"
+                  >
+                    Verificar
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      // Resend code
+                      setEmailError('');
+                      setIsLoading(true);
+                      try {
+                        const res = await fetch(`${API_BASE}/api/auth/request-code`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ email }),
+                        });
+                        setIsLoading(false);
+                        if (!res.ok) {
+                          const j = await res.json().catch(() => ({}));
+                          setEmailError(j.message || 'Erro ao reenviar código');
+                          return;
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        setIsLoading(false);
+                        setEmailError('Erro de rede. Tente novamente.');
+                      }
+                    }}
+                    className="flex-1 bg-transparent border border-purple-600 text-white font-semibold py-3 rounded-lg"
+                  >
+                    Reenviar
+                  </button>
+                </div>
                 <button
                   onClick={handleChatWithMenebot}
-                  className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105"
+                  disabled={!isValidated}
+                  className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-4 disabled:opacity-60"
                 >
                   {content.chatButton}
                 </button>
+              </>
+            ) : (
+              // Caso final: usuário já validado - mostra mensagem de sucesso e botão para abrir o chat
+              <>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <svg className="w-12 h-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-white text-center">{content.successMessage}</h3>
+                  <p className="text-sm text-gray-300 text-center">{content.modalDescription}</p>
+                  <button
+                    onClick={handleChatWithMenebot}
+                    className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-2"
+                  >
+                    {content.chatButton}
+                  </button>
+                </div>
               </>
             )}
           </div>
