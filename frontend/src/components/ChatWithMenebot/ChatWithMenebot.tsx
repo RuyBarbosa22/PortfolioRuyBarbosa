@@ -35,7 +35,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   const [showCheckAnimation, setShowCheckAnimation] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [savedEmail, setSavedEmail] = useState(''); // Email salvo para o chat
-  const [step, setStep] = useState<'enter-email'|'enter-code'>('enter-email');
+  const [step, setStep] = useState<'enter-email'|'enter-code'|'validated'>('enter-email');
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -126,6 +126,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
     setEmailError('');
     setIsValidated(false);
     setShowCheckAnimation(false);
+    setStep('enter-email');
   };
 
   const handleCloseModal = () => {
@@ -134,6 +135,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
     setEmailError('');
     setIsValidated(false);
     setShowCheckAnimation(false);
+    setStep('enter-email');
   };
 
   const handleChatWithMenebot = async () => {
@@ -243,7 +245,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
           </div>
 
           {/* Descrição - padrão Hero/MyStory */}
-          <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] md:mx-auto text-justify lg:text-center">
+          <p className="text-sm sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] md:mx-auto text-justify lg:text-center">
             {content.description}
           </p>
 
@@ -334,7 +336,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                 {/* Animação de Check */}
                 {showCheckAnimation && (
                   <div className="flex justify-center mb-6">
-                    <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center animate-bounce">
+                    <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
                       <svg className="w-12 h-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
@@ -353,7 +355,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                 />
                 {codeError && <p className="text-red-400 text-sm mb-2 text-center">{codeError}</p>}
 
-                <div className="flex gap-3">
+                <div>
                   <button
                     onClick={async () => {
                       setCodeError('');
@@ -374,54 +376,26 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                           setCodeError(j.message || 'Falha ao verificar código');
                           return;
                         }
+                        // Show a small check icon (static), then move to validated step without intermediate flashes
                         setShowCheckAnimation(true);
-                        setTimeout(() => setIsValidated(true), 400);
+                        setTimeout(() => {
+                          setShowCheckAnimation(false);
+                          setIsValidated(true);
+                          setStep('validated');
+                        }, 400);
                       } catch (err) {
                         console.error(err);
                         setIsLoading(false);
                         setCodeError('Erro de rede. Tente novamente.');
                       }
                     }}
-                    className="flex-1 bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg"
+                    className="w-full bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg"
                   >
                     Verificar
                   </button>
-
-                  <button
-                    onClick={async () => {
-                      // Resend code
-                      setEmailError('');
-                      setIsLoading(true);
-                      try {
-                        const res = await fetch(`${API_BASE}/api/auth/request-code`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ email }),
-                        });
-                        setIsLoading(false);
-                        if (!res.ok) {
-                          const j = await res.json().catch(() => ({}));
-                          setEmailError(j.message || 'Erro ao reenviar código');
-                          return;
-                        }
-                      } catch (err) {
-                        console.error(err);
-                        setIsLoading(false);
-                        setEmailError('Erro de rede. Tente novamente.');
-                      }
-                    }}
-                    className="flex-1 bg-transparent border border-purple-600 text-white font-semibold py-3 rounded-lg"
-                  >
-                    Reenviar
-                  </button>
                 </div>
-                <button
-                  onClick={handleChatWithMenebot}
-                  disabled={!isValidated}
-                  className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-4 disabled:opacity-60"
-                >
-                  {content.chatButton}
-                </button>
+                {/* O botão de abrir o chat não deve ser exibido enquanto o usuário não estiver validado.
+                    Ele aparece na tela final (quando isValidated === true). */}
               </>
             ) : (
               // Caso final: usuário já validado - mostra mensagem de sucesso e botão para abrir o chat

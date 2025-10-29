@@ -132,7 +132,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         {/* Hamburger Menu Button - Mobile Only */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden flex flex-col gap-1.5 p-2 z-50"
+          className="md:hidden flex flex-col gap-1.5 p-2 z-50"
           aria-label="Toggle menu"
         >
           <span className={`block w-6 h-0.5 bg-[var(--color-primary)] transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
@@ -151,14 +151,14 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
           <div 
-            className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
 
         {/* Mobile Menu */}
         <div className={`
-          lg:hidden fixed top-0 left-0 h-screen w-[280px] bg-black/95 backdrop-blur-md border-r border-[var(--color-primary)]/20 
+          md:hidden fixed top-0 left-0 h-screen w-[280px] bg-black/95 backdrop-blur-md border-r border-[var(--color-primary)]/20 
           transition-transform duration-300 ease-out z-40
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}>
@@ -241,7 +241,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         </div>
 
         {/* Center links - Desktop Only (with animated sliding underline) */}
-        <div className="hidden lg:flex gap-1.5 items-center bg-black/40 border border-[var(--color-primary)]/20 px-2.5 py-[0.45rem] rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)] justify-self-center">
+        <div className="hidden md:flex gap-1.5 items-center bg-black/40 border border-[var(--color-primary)]/20 px-2.5 py-[0.45rem] rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)] justify-self-center">
           {navLinks.map((link) => (
             <a
               key={link.name}
@@ -254,7 +254,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
               }}
               className={`
                 inline-block px-[1.4rem] py-[0.65rem] rounded-full 
-                font-[var(--font-montserrat)] text-[0.9rem] font-medium whitespace-nowrap
+                font-[var(--font-montserrat)] text-xl whitespace-nowrap
                 transition-all duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)]
                 ${activeLink === link.name
                   ? 'bg-[var(--color-primary)] text-white font-semibold shadow-[0_4px_12px_rgba(125,68,255,0.4),0_0_20px_rgba(125,68,255,0.3)] -translate-y-px animate-[var(--animate-slide-in)]'
@@ -269,7 +269,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         </div>
 
         {/* Right side - Social icons with Language Switch - Desktop Only */}
-        <div className="relative justify-self-end hidden lg:block">
+  <div className="relative justify-self-end hidden md:block">
           {/* Social icons */}
           <div className="flex gap-2.5 items-center bg-black/40 border border-[var(--color-primary)]/20 px-3 py-2.5 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)]">
             {[
@@ -319,7 +319,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         </div>
 
         {/* Mobile - Empty spacer for symmetry */}
-        <div className="lg:hidden w-10"></div>
+        <div className="md:hidden w-10"></div>
       </nav>
     </header>
   );

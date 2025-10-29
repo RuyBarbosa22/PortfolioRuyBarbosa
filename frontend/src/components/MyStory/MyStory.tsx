@@ -17,30 +17,30 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
     pt: {
       title: 'Minha história',
       description: 'Olá! Sou de São Paulo (SP), formado em Desenvolvimento de Sistemas pela Etec Doutor José Coury e atualmente cursando Sistemas de Informação na SPTech School. Nascido em 17 de novembro de 2003, adoro explorar novas experiências e jogar. Escolhi ser programador pela liberdade de viajar e a qualidade de vida. Sou criativo, simpático e detalhista, sempre buscando aprender e melhorar. Estou animado para contribuir com minhas habilidades e enfrentar novos desafios!',
-      stats: [
+        stats: [
         { value: '4+', label: 'Anos de experiência' },
         { value: '8+', label: 'Projetos realizados' },
-        { value: '12+', label: 'Tecnologias utilizadas' },
+        { value: '16+', label: 'Tecnologias utilizadas' },
         { value: '1', label: 'Empresas trabalhadas' }
       ]
     },
     en: {
       title: 'My story',
       description: 'Hello! I\'m from São Paulo (SP), graduated in Systems Development from Etec Doutor José Coury and currently studying Information Systems at SPTech School. Born on November 17, 2003, I love exploring new experiences and gaming. I chose to be a programmer for the freedom to travel and quality of life. I\'m creative, friendly and detail-oriented, always seeking to learn and improve. I\'m excited to contribute my skills and face new challenges!',
-      stats: [
+        stats: [
         { value: '4+', label: 'Years of experience' },
         { value: '8+', label: 'Projects completed' },
-        { value: '12+', label: 'Technologies used' },
+        { value: '16+', label: 'Technologies used' },
         { value: '1', label: 'Companies worked' }
       ]
     },
     es: {
       title: 'Mi historia',
       description: '¡Hola! Soy de São Paulo (SP), graduado en Desarrollo de Sistemas por Etec Doutor José Coury y actualmente estudiando Sistemas de Información en SPTech School. Nacido el 17 de noviembre de 2003, me encanta explorar nuevas experiencias y jugar. Elegí ser programador por la libertad de viajar y la calidad de vida. Soy creativo, simpático y detallista, siempre buscando aprender y mejorar. ¡Estoy emocionado de contribuir con mis habilidades y enfrentar nuevos desafíos!',
-      stats: [
+        stats: [
         { value: '4+', label: 'Años de experiencia' },
         { value: '8+', label: 'Proyectos realizados' },
-        { value: '12+', label: 'Tecnologías utilizadas' },
+        { value: '16+', label: 'Tecnologías utilizadas' },
         { value: '1', label: 'Empresas trabajadas' }
       ]
     }
@@ -69,7 +69,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
               <h2 className="text-3xl md:text-4xl font-extrabold text-center md:text-left mb-4 text-[var(--color-primary)] font-['Montserrat',sans-serif]">
                 {content.title}
               </h2>
-              <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-8 text-justify">
+              <p className="text-sm sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-8 text-justify">
                 {content.description}
               </p>
             </div>

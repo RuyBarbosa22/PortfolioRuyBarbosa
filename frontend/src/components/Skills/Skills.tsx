@@ -49,7 +49,7 @@ export default function Skills({ language }: SkillsProps) {
             {t.skills?.heading ?? 'Soft Skills'}
           </h2>
           <p
-            className="text-gray-300 text-base text-center w-[60%] md:text-lg mx-auto leading-relaxed"
+            className="text-gray-200 text-base text-center w-[80%] md:text-xl mx-auto leading-relaxed"
             style={{ fontFamily: 'var(--font-roboto-mono)', color: 'rgba(229,229,234,0.9)' }}
           >
             {t.skills?.description ?? 'Essas são minhas principais soft skills e como eu as aplico na prática.'}

@@ -20,11 +20,9 @@ export const Footer: React.FC<Props> = ({ language = "pt" }) => {
           <div className="flex-1">
             <h4 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">
               <span className="block text-3xl md:text-4xl font-extrabold text-left sm:**:mb-6 text-[var(--color-primary)] font-['Montserrat',sans-serif]">{t.titleLine1}</span>
-              <span className="block text-transparent bg-gradient-radial from-[#E204F5] via-[#CC12F7] to-[#7D44FF] bg-clip-text font-black text-4xl md:text-5xl">
-                {t.titleLine2}
-              </span>
+   
             </h4>
-            <p className="text-gray-300 max-w-xl leading-relaxed mt-2">
+            <p className="text-gray-300 max-w-2xl md:text-lg font-roboto-mono leading-relaxed mt-2">
               {t.description}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">

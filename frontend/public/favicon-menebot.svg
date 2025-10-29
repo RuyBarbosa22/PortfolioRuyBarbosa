@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" preserveAspectRatio="xMidYMid meet">
+  <!-- SVG wrapper that embeds the PNG to preserve aspect ratio and avoid stretching in the favicon -->
+  <rect width="100%" height="100%" fill="#0b0b0f" rx="8"/>
+  <image href="/src/assets/content/menebot/menebot_frente.png" x="6" y="6" width="52" height="52" preserveAspectRatio="xMidYMid meet" />
+</svg>
