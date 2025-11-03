@@ -1,4 +1,5 @@
 import React from "react";
+import cvFile from "../../assets/content/CV - Ruy Barbosa.pdf";
 import { translations } from "../../i18n";
 import { FaWhatsapp, FaGithub, FaLinkedin } from 'react-icons/fa';
 
@@ -30,8 +31,8 @@ export const Footer: React.FC<Props> = ({ language = "pt" }) => {
                 {t.linkPortfolio}
               </a>
 
-              {/* Resume download - expects /resume.pdf to be placed in public/ */}
-              <a href="/resume.pdf" download className="text-sm text-white/80 hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2" aria-label="Download CV">
+              {/* Resume download - use embedded asset */}
+              <a href={cvFile} download className="text-sm text-white/80 hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2" aria-label="Download CV">
                 {t.linkResume}
               </a>
 

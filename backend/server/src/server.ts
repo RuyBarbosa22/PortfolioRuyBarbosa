@@ -244,7 +244,8 @@ async function generateResponse(query: string, context: string, language: string
   const systemPrompt = `Você é Menebot, o assistente virtual criado por Ruy Barbosa de Castro para responder perguntas sobre ele — tanto no contexto profissional quanto pessoal.
 Seu objetivo é conversar de forma natural, simpática e inteligente, transmitindo informações factuais sobre o Ruy de modo agradável, conciso e humano.
 Você fala sobre o Ruy, e não como se fosse ele.
-Quando apropriado, adote um tom leve, curioso e divertido — especialmente em perguntas sobre curiosidades, comportamentos ou preferências pessoais.
+Quando apropriado, adote um tom leve, curioso e divertido — especialmente em perguntas sobre curiosidades, comportamentos ou preferências pessoais. Se a pergunta estiver fora do escopo desse contexto, você deve recusar educadamente e 
+não tentar gerar uma resposta baseada em conhecimento externo, web ou dedução livre.
 
 CONTEXTO FORNECIDO:
 ${context}
@@ -418,68 +419,14 @@ async function startServer() {
 
       await ddbClient.send(put);
 
-      // Send email via SES (HTML + text fallback)
-      // Use FRONTEND_URL to reference the Menebot icon hosted in the frontend public assets.
-      const menebotIcon = `${FRONTEND_URL.replace(/\/$/, '')}/assets/content/menebot/menebot_frente.png`;
-
-      const subject = 'Seu código de verificação — Menebot';
-
+      // Send email via SES
       const bodyText = `Seu código de verificação Menebot é: ${code}\n\nEste código expira em 5 minutos.`;
-
-      const htmlBody = `
-        <!doctype html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <title>${subject}</title>
-          <style>
-            body { background-color: #0b0b0f; color: #e6e6f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; padding:0; }
-            .container { max-width: 600px; margin: 24px auto; background: linear-gradient(180deg, rgba(17,11,35,0.9), rgba(6,3,12,0.95)); border: 1px solid rgba(109,63,232,0.15); border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-            .header { display:flex; align-items:center; gap:16px; }
-            .icon { width:64px; height:64px; border-radius:12px; background:rgba(255,255,255,0.02); display:flex; align-items:center; justify-content:center; }
-            .title { font-size:18px; font-weight:700; color:#fff; }
-            .subtitle { font-size:13px; color:#cfcff7; margin-top:4px; }
-            .code { margin: 18px 0; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; letter-spacing:4px; color:#1b0236; background:linear-gradient(90deg,#9b6bff,#6d3fe8); padding:12px 20px; border-radius:10px; }
-            .note { font-size:13px; color:#bfbfe8; margin-top:8px; }
-            .footer { margin-top:20px; font-size:12px; color:#9f9fd6; }
-            a.button { display:inline-block; margin-top:14px; background:#6d3fe8; color:#fff; padding:10px 16px; border-radius:8px; text-decoration:none; font-weight:600; }
-            @media (max-width:480px){ .container{ margin:12px; padding:16px } .code{ font-size:22px } }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div class="icon">
-                <img src="${menebotIcon}" alt="Menebot" style="width:48px;height:48px;object-fit:contain;" />
-              </div>
-              <div>
-                <div class="title">Código de verificação Menebot</div>
-                <div class="subtitle">Use este código para validar seu e-mail e iniciar uma conversa com o Menebot.</div>
-              </div>
-            </div>
-
-            <div class="code">${code}</div>
-
-            <div class="note">Este código expira em 5 minutos. Se você não solicitou este código, ignore este e-mail.</div>
-
-            <a class="button" href="${FRONTEND_URL}" target="_blank" rel="noreferrer">Voltar ao site</a>
-
-            <div class="footer">Menebot — criado por Ruy Barbosa de Castro</div>
-          </div>
-        </body>
-        </html>
-      `;
-
       const sendCmd = new SendEmailCommand({
         Source: SES_FROM_EMAIL,
         Destination: { ToAddresses: [email] },
         Message: {
-          Subject: { Data: subject },
-          Body: {
-            Html: { Data: htmlBody },
-            Text: { Data: bodyText },
-          },
+          Subject: { Data: 'Seu código de verificação' },
+          Body: { Text: { Data: bodyText } },
         },
       });
 

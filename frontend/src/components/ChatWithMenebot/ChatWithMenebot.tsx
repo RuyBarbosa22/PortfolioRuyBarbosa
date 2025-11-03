@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useMenebotChat } from '../../context/MenebotChatContext';
+import { postVisit } from '../../utils/metrics';
 import menebotFrente from '../../assets/content/menebot/menebot_frente.png';
 import menebotEsquerda from '../../assets/content/menebot/menebot_esquerda.png';
 import menebotDireita from '../../assets/content/menebot/menebot_direita.png';
@@ -27,6 +29,105 @@ interface ChatWithMenebotProps {
   { image: menebotBaixo, bottom: '16%', right: '32%', xlRight: '24%' },
   ];
 
+// Counter banner component (6 digits) - fetches real metrics and animates to value
+const CounterBanner: React.FC = () => {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
+    const CACHE_KEY = 'menebot_metrics_cache';
+    const CACHE_TTL = Number(import.meta.env.VITE_METRICS_CACHE_TTL_MS || 30000);
+    let rafId = 0;
+    let start: number | null = null;
+    const duration = 2000; // animation duration
+
+    const animateTo = (target: number) => {
+      start = null;
+      const step = (timestamp: number) => {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start!) / duration, 1);
+        const v = Math.floor(progress * target);
+        setValue(v);
+        if (progress < 1) {
+          rafId = requestAnimationFrame(step);
+        } else {
+          setValue(target);
+        }
+      };
+      rafId = requestAnimationFrame(step);
+    };
+
+    let mounted = true;
+
+    // If we have a recent value in sessionStorage, use it and avoid network calls
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.ts && Date.now() - parsed.ts < CACHE_TTL) {
+          const base = Number(parsed.value ?? 0) || 0;
+          animateTo(base + 40);
+          return;
+        }
+      }
+    } catch (e) {
+      // ignore storage errors
+    }
+
+    // Retry logic: try multiple times before falling back
+    (async () => {
+      const attempts = 4;
+      const delays = [500, 1000, 2000, 3000];
+      let lastError: any = null;
+      for (let i = 0; i < attempts; i++) {
+        try {
+          const res = await fetch(`${API_BASE}/api/metrics`, { credentials: 'include' });
+          if (!res.ok) throw new Error('Metrics fetch failed');
+          const j = await res.json();
+          if (!mounted) return;
+          // Prefer verifiedUsers (users who went through verification), fallback to visits
+          // Add +40 to the real value as requested
+          const base = Number(j.verifiedUsers ?? j.visits ?? 0) || 0;
+          const target = base + 40;
+          // Store in sessionStorage for quick subsequent loads
+          try {
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify({ value: base, ts: Date.now() }));
+          } catch (e) {
+            /* ignore */
+          }
+          animateTo(target);
+          return;
+        } catch (err) {
+          lastError = err;
+          // wait before next attempt (if any)
+          if (i < delays.length) await new Promise((r) => setTimeout(r, delays[i]));
+        }
+      }
+      console.debug('Could not fetch metrics after retries, falling back to 140', lastError);
+      if (!mounted) return;
+      animateTo(140);
+    })();
+
+    return () => {
+      mounted = false;
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  const display = String(value).padStart(6, '0');
+
+  return (
+    <div className="w-full flex justify-center mt-12">
+      <div className="text-center">
+        <h3 className="text-lg md:text-xl font-semibold text-[var(--color-primary)] mb-2">Usuários que já testaram o Menebot!</h3>
+        <div className="font-['Roboto_Mono',monospace] text-4xl md:text-6xl font-extrabold tracking-[0.06em] text-white">
+          {display}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt' }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState('');
@@ -34,11 +135,15 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   const [isValidated, setIsValidated] = useState(false);
   const [showCheckAnimation, setShowCheckAnimation] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showConfirmClose, setShowConfirmClose] = useState(false);
+  const [pendingSection, setPendingSection] = useState<string | null>(null); // para navegação futura
   const [savedEmail, setSavedEmail] = useState(''); // Email salvo para o chat
   const [step, setStep] = useState<'enter-email'|'enter-code'|'validated'>('enter-email');
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [visitSentAfterVerify, setVisitSentAfterVerify] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -138,8 +243,69 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
     setStep('enter-email');
   };
 
+  // Bloqueia/desbloqueia scroll do body ao abrir/fechar chat
+  useEffect(() => {
+    if (showChat) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showChat]);
+
+  // Função para realmente fechar o chat (usada após confirmação)
+  const { clearPendingSection, pendingSection: globalPendingSection, setChatOpen: setGlobalChatOpen } = useMenebotChat();
+  const doCloseChat = useCallback(() => {
+    setShowChat(false);
+    setSessionId(null);
+    setShowConfirmClose(false);
+    setPendingSection(null);
+    clearPendingSection(); // limpa pendingSection global para restaurar menu
+    // atualiza estado global
+    setGlobalChatOpen(false);
+  }, [clearPendingSection, setGlobalChatOpen]);
+
+  // Handler para X/menu: pede confirmação
+  const handleRequestCloseChat = useCallback((sectionId?: string) => {
+    setShowConfirmClose(true);
+    setPendingSection(sectionId || null);
+  }, []);
+
+  // Handler para confirmação de saída
+  const handleConfirmClose = useCallback(() => {
+    setTimeout(async () => {
+      try {
+        if (sessionId) {
+          await fetch(`${API_BASE}/api/auth/session-end`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: savedEmail, sessionId }),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to end session', e);
+      }
+      doCloseChat();
+      // Se veio do menu, rolar para a seção após fechar
+      if (pendingSection) {
+        setTimeout(() => {
+          const el = document.getElementById(pendingSection);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 400);
+      }
+    }, 300);
+  }, [sessionId, savedEmail, doCloseChat, pendingSection]);
+
+  // Handler para cancelar saída
+  const handleCancelClose = useCallback(() => {
+    setShowConfirmClose(false);
+    setPendingSection(null);
+  }, []);
+
+  // Handler para abrir o chat (iniciar sessão)
   const handleChatWithMenebot = async () => {
-    // Start session with backend
     try {
       setIsLoading(true);
       const res = await fetch(`${API_BASE}/api/auth/session-start`, {
@@ -159,6 +325,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       setSavedEmail(email);
       setTimeout(() => {
         setShowChat(true);
+        setGlobalChatOpen(true);
         handleCloseModal();
       }, 300);
     } catch (err) {
@@ -168,24 +335,17 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
     }
   };
 
-  const handleCloseChat = () => {
-    setTimeout(async () => {
-      // End session if exists
-      try {
-        if (sessionId) {
-          await fetch(`${API_BASE}/api/auth/session-end`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: savedEmail, sessionId }),
-          });
-        }
-      } catch (e) {
-        console.error('Failed to end session', e);
-      }
-      setShowChat(false);
-      setSessionId(null);
-    }, 300);
-  };
+  // Não fecha mais ao clicar fora! Só X ou menu.
+  // handleCloseChat só chamado internamente após confirmação
+
+  // Se o Navbar pediu navegação (pendingSection global) enquanto o chat está aberto,
+  // exibimos a modal de confirmação aqui e guardamos a seção pendente localmente.
+  useEffect(() => {
+    if (globalPendingSection && showChat) {
+      setPendingSection(globalPendingSection);
+      setShowConfirmClose(true);
+    }
+  }, [globalPendingSection, showChat]);
 
   return (
     <section className="relative w-full bg-black py-24 md:py-48 lg:py-60 overflow-hidden min-h-screen">
@@ -280,6 +440,9 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
               className="hidden sm:block lg:hidden w-20 h-20 md:w-28 md:h-28 object-contain transition-transform duration-300 hover:-translate-y-2 hover:scale-110"
             />
           </div>
+
+          {/* Contador centralizado (6 dígitos) - mostra abaixo do CTA e centralizado em todas as resoluções */}
+          <CounterBanner />
         </div>
       </div>
 
@@ -344,6 +507,14 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                   </div>
                 )}
 
+                {/* Loading final state: shows while waiting extraDelay (1s + validation time) */}
+                {isFinalizing && (
+                  <div className="flex flex-col items-center gap-2 mb-4">
+                    <div className="w-8 h-8 border-2 border-t-transparent border-white rounded-full animate-spin" />
+                    <p className="text-sm text-gray-300">Finalizando...</p>
+                  </div>
+                )}
+
                 {/* Enter verification code */}
                 <h4 className="text-white font-semibold text-center mb-3">Verifique seu e-mail</h4>
                 <input
@@ -351,48 +522,64 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="Código de 6 dígitos"
-                  className="w-full px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors mb-2 text-center"
+                  className="w-full px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors mb-2 text-center disabled:opacity-60"
+                  disabled={isFinalizing || isLoading}
                 />
                 {codeError && <p className="text-red-400 text-sm mb-2 text-center">{codeError}</p>}
 
                 <div>
-                  <button
-                    onClick={async () => {
-                      setCodeError('');
-                      if (!code || code.trim().length < 4) {
-                        setCodeError('Código inválido');
-                        return;
-                      }
-                      setIsLoading(true);
-                      try {
-                        const res = await fetch(`${API_BASE}/api/auth/verify-code`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ email, code }),
-                        });
-                        setIsLoading(false);
-                        if (!res.ok) {
-                          const j = await res.json().catch(() => ({}));
-                          setCodeError(j.message || 'Falha ao verificar código');
+                    <button
+                      onClick={async () => {
+                        setCodeError('');
+                        if (!code || code.trim().length < 4) {
+                          setCodeError('Código inválido');
                           return;
                         }
-                        // Show a small check icon (static), then move to validated step without intermediate flashes
-                        setShowCheckAnimation(true);
-                        setTimeout(() => {
-                          setShowCheckAnimation(false);
-                          setIsValidated(true);
-                          setStep('validated');
-                        }, 400);
-                      } catch (err) {
-                        console.error(err);
-                        setIsLoading(false);
-                        setCodeError('Erro de rede. Tente novamente.');
-                      }
-                    }}
-                    className="w-full bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg"
-                  >
-                    Verificar
-                  </button>
+
+                        // measure validation time (from request start to response)
+                        const verifyStart = Date.now();
+                        setIsLoading(true);
+                        try {
+                          const res = await fetch(`${API_BASE}/api/auth/verify-code`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, code }),
+                          });
+                          const validationDuration = Date.now() - verifyStart;
+                          setIsLoading(false);
+                          if (!res.ok) {
+                            const j = await res.json().catch(() => ({}));
+                            setCodeError(j.message || 'Falha ao verificar código');
+                            return;
+                          }
+
+                          // Show check icon, then a loading state for 1s + validationDuration
+                          setShowCheckAnimation(true);
+                          setIsFinalizing(true);
+                          const extraDelay = 1000 + validationDuration; // 1s + time taken by validation
+
+                          setTimeout(() => {
+                            setShowCheckAnimation(false);
+                            setIsFinalizing(false);
+                            setIsValidated(true);
+                            setStep('validated');
+                            // report visit after successful verification (only once per modal/session)
+                            if (!visitSentAfterVerify) {
+                              postVisit().catch((e) => console.debug('postVisit after verify failed', e));
+                              setVisitSentAfterVerify(true);
+                            }
+                          }, extraDelay);
+                        } catch (err) {
+                          console.error(err);
+                          setIsLoading(false);
+                          setCodeError('Erro de rede. Tente novamente.');
+                        }
+                      }}
+                      disabled={isFinalizing || isLoading}
+                      className="w-full bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg disabled:opacity-60"
+                    >
+                      Verificar
+                    </button>
                 </div>
                 {/* O botão de abrir o chat não deve ser exibido enquanto o usuário não estiver validado.
                     Ele aparece na tela final (quando isValidated === true). */}
@@ -423,12 +610,42 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
 
       {/* Chat Component - Ocupa toda a section com fade in */}
       {showChat && (
-        <div className="absolute inset-0 z-20 animate-fadeIn">
+        // Colocamos z menor que o header (header z-50) para que a navbar permaneça visível
+        <div className="fixed inset-0 z-40 animate-fadeIn">
           <MenebotChat
             email={savedEmail}
-            onClose={handleCloseChat}
+            onClose={() => handleRequestCloseChat()}
             language={language}
           />
+          {/* Modal de confirmação de saída */}
+          {showConfirmClose && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fadeIn">
+              <div className="relative bg-gradient-to-br from-[#181825] to-black border border-[var(--color-primary)]/40 rounded-2xl px-8 py-10 max-w-md w-full shadow-2xl shadow-[var(--color-primary)]/20 flex flex-col items-center animate-fadeInUp">
+                <h3 className="text-2xl font-extrabold text-white mb-3 text-center font-['Montserrat',sans-serif] tracking-tight drop-shadow-[0_2px_12px_rgba(125,68,255,0.25)]">
+                  {language === 'en' ? 'Do you really want to leave?' : language === 'es' ? '¿Realmente deseas salir?' : 'Deseja realmente sair?'}
+                </h3>
+                <p className="text-base text-gray-300 text-center mb-7 font-['Roboto_Mono',monospace]">
+                  {language === 'en' ? 'You will lose this conversation.' : language === 'es' ? 'Perderás esta conversación.' : 'Você perderá essa conversa.'}
+                </p>
+                <div className="flex gap-4 w-full justify-center">
+                  {/* Botão NÃO: solid, igual HeroSection */}
+                  <button
+                    onClick={handleCancelClose}
+                    className="w-auto min-w-[120px] px-6 md:px-8 py-3 bg-[var(--color-primary)] text-white font-semibold text-base rounded-full hover:bg-[var(--color-primary-light)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.6)] transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap"
+                  >
+                    {language === 'en' ? 'No' : language === 'es' ? 'No' : 'Não'}
+                  </button>
+                  {/* Botão SIM: outline, igual HeroSection */}
+                  <button
+                    onClick={handleConfirmClose}
+                    className="w-auto min-w-[120px] px-6 md:px-8 py-3 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-semibold text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap"
+                  >
+                    {language === 'en' ? 'Yes' : language === 'es' ? 'Sí' : 'Sim'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </section>

@@ -1,6 +1,6 @@
 // Arquivo: src/App.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "./components/Navbar/Navbar";
 import { translations, defaultLanguage } from "./i18n";
 import type { Lang } from "./i18n";
@@ -18,6 +18,7 @@ import nodeIcon from "./assets/icons/node-js-svgrepo-com.svg";
 import { MyStory } from "./components/MyStory/MyStory";
 import Skills from "./components/Skills/Skills";
 import { ChatWithMenebot } from "./components/ChatWithMenebot/ChatWithMenebot";
+import { MenebotChatProvider } from "./context/MenebotChatContext";
 import { useRef } from "react";
 import type { CarouselHandle } from "./components/ProjectsCarousel/Carousel";
 import htmlIcon from "./assets/icons/icons8-html.svg";
@@ -47,6 +48,14 @@ function App() {
   // ref to control Carousel from this parent
   const carouselRef = useRef<CarouselHandle | null>(null);
   const talkBoxRef = useRef<TalkBoxHandle | null>(null);
+
+  // send a single visit metric when the app first mounts
+  useEffect(() => {
+    // dynamic import to keep startup fast and avoid bundling if not needed
+    import('./utils/metrics').then(({ postVisit }) => {
+      postVisit().catch((e: any) => console.debug('metrics postVisit failed', e));
+    }).catch((e) => console.debug('metrics module load failed', e));
+  }, []);
 
   // Array de mensagens do Menebot - traduções
   const menebotMessagesByLang: Record<string, string[]> = {
@@ -188,7 +197,8 @@ function App() {
   };
 
   return (
-    // Fundo preto aplicado a toda a página
+    <MenebotChatProvider>
+    {/* Fundo preto aplicado a toda a página */}
     <div className="min-h-screen w-full bg-black text-white relative overflow-x-hidden">
       {/* Background animado com glows */}
       <AnimatedBackground />
@@ -676,6 +686,7 @@ function App() {
       {/* Footer */}
       <Footer language={currentLanguage} />
     </div>
+    </MenebotChatProvider>
   );
 }
 

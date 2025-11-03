@@ -8,6 +8,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+  "count-users": "tsx src/scripts/count-users.ts",
     "ingest": "tsx src/ingest-pdf.ts",
     "check-llama": "tsx src/check-llama.ts",
     "test": "vitest",

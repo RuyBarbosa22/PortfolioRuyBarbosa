@@ -1,6 +1,7 @@
 // Arquivo: src/components/Navbar/Navbar.tsx
 
 import { useState, useRef, useEffect } from 'react';
+import { useMenebotChat } from '../../context/MenebotChatContext';
 import { FaWhatsapp, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { MdTranslate } from 'react-icons/md';
 import { LanguageSwitch } from '../LanguageSwitch/LanguageSwitch';
@@ -14,6 +15,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
+  const { isChatOpen, requestClose } = useMenebotChat();
   // Sections order must match the labels in translations.nav exactly.
   // Desired order: home, sobre, habilidades, menebot, projetos, contato
   const sectionIds = ['home','sobre','habilidades','chat-with-menebot-section','projetos','contato'];
@@ -132,7 +134,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         {/* Hamburger Menu Button - Mobile Only */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden flex flex-col gap-1.5 p-2 z-50"
+          className="lg:hidden flex flex-col gap-1.5 p-2 z-50"
           aria-label="Toggle menu"
         >
           <span className={`block w-6 h-0.5 bg-[var(--color-primary)] transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
@@ -141,8 +143,20 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         </button>
 
         {/* Brand - Centered on mobile, left on desktop */}
-        <a 
-          href="#" 
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            const homeLabel = translations[selectedLanguage].nav[0];
+            setActiveLink(homeLabel);
+            // if chat is open, request close with 'home' section id so ChatWithMenebot shows confirmation
+            if (isChatOpen) {
+              requestClose('home');
+            } else {
+              const el = document.getElementById('home');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }}
           className="font-[var(--font-montserrat)] font-bold text-[1.1rem] md:text-[1.3rem] text-[var(--color-primary)] tracking-[-0.02em] lg:justify-self-start transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-[var(--color-primary-lighter)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.8)] hover:drop-shadow-[0_0_6px_rgba(125,68,255,0.6)] absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0"
         >
           Ruy Barbosa
@@ -151,14 +165,14 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
           <div 
-            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+            className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
 
         {/* Mobile Menu */}
         <div className={`
-          md:hidden fixed top-0 left-0 h-screen w-[280px] bg-black/95 backdrop-blur-md border-r border-[var(--color-primary)]/20 
+          lg:hidden fixed top-0 left-0 h-screen w-[280px] bg-black/95 backdrop-blur-md border-r border-[var(--color-primary)]/20 
           transition-transform duration-300 ease-out z-40
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}>
@@ -172,9 +186,13 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
                   e.preventDefault();
                   setActiveLink(link.name);
                   setIsMobileMenuOpen(false);
-                  const el = document.getElementById(link.id);
-                  if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  if (isChatOpen) {
+                    requestClose(link.id);
+                  } else {
+                    const el = document.getElementById(link.id);
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                   }
                 }}
                 className={`
@@ -241,7 +259,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         </div>
 
         {/* Center links - Desktop Only (with animated sliding underline) */}
-        <div className="hidden md:flex gap-1.5 items-center bg-black/40 border border-[var(--color-primary)]/20 px-2.5 py-[0.45rem] rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)] justify-self-center">
+        <div className="hidden lg:flex gap-1.5 items-center bg-black/40 border border-[var(--color-primary)]/20 px-2.5 py-[0.45rem] rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)] justify-self-center">
           {navLinks.map((link) => (
             <a
               key={link.name}
@@ -249,12 +267,16 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
               onClick={(e) => {
                 e.preventDefault();
                 setActiveLink(link.name);
-                const el = document.getElementById(link.id);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (isChatOpen) {
+                  requestClose(link.id);
+                } else {
+                  const el = document.getElementById(link.id);
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
               }}
               className={`
                 inline-block px-[1.4rem] py-[0.65rem] rounded-full 
-                font-[var(--font-montserrat)] text-xl whitespace-nowrap
+                font-[var(--font-montserrat)] text-[0.9rem] font-medium whitespace-nowrap
                 transition-all duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)]
                 ${activeLink === link.name
                   ? 'bg-[var(--color-primary)] text-white font-semibold shadow-[0_4px_12px_rgba(125,68,255,0.4),0_0_20px_rgba(125,68,255,0.3)] -translate-y-px animate-[var(--animate-slide-in)]'
@@ -269,7 +291,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         </div>
 
         {/* Right side - Social icons with Language Switch - Desktop Only */}
-  <div className="relative justify-self-end hidden md:block">
+        <div className="relative justify-self-end hidden lg:block">
           {/* Social icons */}
           <div className="flex gap-2.5 items-center bg-black/40 border border-[var(--color-primary)]/20 px-3 py-2.5 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.03)]">
             {[
@@ -319,7 +341,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         </div>
 
         {/* Mobile - Empty spacer for symmetry */}
-        <div className="md:hidden w-10"></div>
+        <div className="lg:hidden w-10"></div>
       </nav>
     </header>
   );
