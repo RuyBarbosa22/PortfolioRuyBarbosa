@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import menebotFrente from '../../assets/content/menebot/menebot_frente.png';
+import menebotFrente from '/assets/content/menebot/menebot_frente.png';
 
 interface Message {
   id: string;
@@ -28,7 +28,16 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
 
-  const contentByLang: Record<string, { title: string; placeholder: string; send: string; connecting: string; disconnected: string; typing: string; welcomeMessage: string }> = {
+  const contentByLang: Record<string, { 
+    title: string; 
+    placeholder: string; 
+    send: string; 
+    connecting: string; 
+    disconnected: string; 
+    typing: string; 
+    welcomeMessage: string;
+    suggestedQuestions: string[];
+  }> = {
     pt: {
       title: 'Menebot',
       placeholder: 'Digite sua mensagem...',
@@ -37,6 +46,11 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
       disconnected: 'Desconectado',
       typing: 'Menebot está digitando...',
       welcomeMessage: 'Olá! Sou o Menebot 🤖 Pergunte-me sobre Ruy Barbosa de Castro!',
+      suggestedQuestions: [
+        'Qual projeto ou realização técnica você mais se orgulha de ter feito — e por quê?',
+        'Como você se imagina profissionalmente nos próximos 2 a 3 anos?',
+        'O que te motiva na área de tecnologia hoje?',
+      ],
     },
     en: {
       title: 'Menebot',
@@ -46,6 +60,11 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
       disconnected: 'Disconnected',
       typing: 'Menebot is typing...',
       welcomeMessage: 'Hello! I am Menebot 🤖 Ask me about Ruy Barbosa de Castro!',
+      suggestedQuestions: [
+        'What technical project or achievement are you most proud of — and why?',
+        'How do you see yourself professionally in the next 2 to 3 years?',
+        'What motivates you in the tech field today?',
+      ],
     },
     es: {
       title: 'Menebot',
@@ -55,6 +74,11 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
       disconnected: 'Desconectado',
       typing: 'Menebot está escribiendo...',
       welcomeMessage: '¡Hola! Soy Menebot 🤖 ¡Pregúntame sobre Ruy Barbosa de Castro!',
+      suggestedQuestions: [
+        '¿Cuál es el proyecto o logro técnico del que más te enorgulleces — y por qué?',
+        '¿Cómo te ves profesionalmente en los próximos 2 a 3 años?',
+        '¿Qué te motiva en el área de tecnología hoy?',
+      ],
     },
   };
 
@@ -98,7 +122,6 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Conectado ao servidor');
       setIsConnected(true);
 
       // Mensagem de boas-vindas
@@ -113,12 +136,10 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Desconectado do servidor');
       setIsConnected(false);
     });
 
     newSocket.on('response', (data: { message: string; language: string }) => {
-      console.log('📨 Resposta recebida:', data);
       setIsTyping(false);
 
       const newMessage: Message = {
@@ -133,7 +154,6 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
     });
 
     newSocket.on('error', (data: { message: string }) => {
-      console.error('❌ Erro:', data);
       setIsTyping(false);
 
       // Só adiciona mensagem se houver um texto de erro
@@ -152,7 +172,6 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
     setSocket(newSocket);
 
     return () => {
-      console.log('🔌 Limpando conexão WebSocket');
       newSocket.close();
     };
   }, []); // Array vazio - conecta apenas uma vez
@@ -170,14 +189,38 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
 
     setMessages((prev) => [...prev, userMessage]);
 
-    // Envia para o servidor
+    // Envia mensagem para o servidor
     socket.emit('message', {
       message: inputMessage,
-      email: email,
+      email,
+      language,
+    });
+
+    setInputMessage('');
+    setIsTyping(true);
+  };
+
+  const handleSuggestedQuestion = (question: string) => {
+    if (!socket || !isConnected) return;
+
+    // Adiciona mensagem do usuário
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      text: question,
+      sender: 'user',
+      timestamp: Date.now(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+
+    // Envia mensagem para o servidor
+    socket.emit('message', {
+      message: question,
+      email,
+      language,
     });
 
     setIsTyping(true);
-    setInputMessage('');
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -246,7 +289,14 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
           ))}
 
           {isTyping && (
-            <div className="flex justify-start">
+            <div className="flex justify-start items-end gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img 
+                  src={menebotFrente} 
+                  alt="Menebot" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
               <div className="bg-gray-800 text-gray-100 rounded-2xl px-6 py-4">
                 <div className="flex gap-1.5">
                   <div className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1s' }}></div>
@@ -262,6 +312,23 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
 
         {/* Input Area */}
         <div className="p-6 border-t border-purple-500/30">
+          {/* Perguntas Sugeridas */}
+          {messages.length <= 1 && (
+            <div className="mb-4 flex flex-col gap-2">
+              {content.suggestedQuestions.map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSuggestedQuestion(question)}
+                  disabled={!isConnected}
+                  className="text-left text-xs sm:text-sm text-gray-300 hover:text-purple-400 bg-gray-800/50 hover:bg-gray-800 border border-purple-500/20 hover:border-purple-500/50 rounded-lg px-3 py-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-['Roboto_Mono',monospace] truncate"
+                  title={question}
+                >
+                  💡 {question}
+                </button>
+              ))}
+            </div>
+          )}
+          
           <div className="flex gap-3">
             <input
               type="text"

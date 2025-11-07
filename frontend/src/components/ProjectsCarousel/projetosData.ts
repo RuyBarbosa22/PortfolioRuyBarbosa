@@ -1,19 +1,19 @@
-import projetoAuthangular from '../../assets/images/projeto_authangular.png';
-import projetoEcommerce from '../../assets/images/projeto_ecommerce.png';
-import projetoNikeclone from '../../assets/images/projeto_nikeclone.png';
-import projetoPedepet from '../../assets/images/projeto_pedepet.png';
-import angularIcon from '../../assets/icons/icons8-angular.svg';
-import tsIcon from '../../assets/icons/icons8-typescript.svg';
-import nodeIcon from '../../assets/icons/node-js-svgrepo-com.svg';
-import swaggerIcon from '../../assets/icons/swagger-svgrepo-com.svg';
-import reactIcon from '../../assets/icons/react-svgrepo-com.svg';
-import jsIcon from '../../assets/icons/icons8-js.svg';
-import kotlin from '../../assets/icons/icons8-kotlin.svg';
-import spring from '../../assets/icons/icons8-spring-logo.svg';
-import mySql from '../../assets/icons/mysql-svgrepo-com.svg';
-import tailwindIcon from '../../assets/icons/icons8-tailwind-css.svg';
-import htmlIcon from '../../assets/icons/icons8-html.svg';
-import cssIcon from '../../assets/icons/icons8-css.svg';
+import projetoAuthangular from '/assets/images/projeto_authangular.png';
+import projetoEcommerce from '/assets/images/projeto_ecommerce.png';
+import projetoNikeclone from '/assets/images/projeto_nikeclone.png';
+import projetoPedepet from '/assets/images/projeto_pedepet.png';
+import angularIcon from '/assets/icons/icons8-angular.svg';
+import tsIcon from '/assets/icons/icons8-typescript.svg';
+import nodeIcon from '/assets/icons/node-js-svgrepo-com.svg';
+import swaggerIcon from '/assets/icons/swagger-svgrepo-com.svg';
+import reactIcon from '/assets/icons/react-svgrepo-com.svg';
+import jsIcon from '/assets/icons/icons8-js.svg';
+import kotlin from '/assets/icons/icons8-kotlin.svg';
+import spring from '/assets/icons/icons8-spring-logo.svg';
+import mySql from '/assets/icons/mysql-svgrepo-com.svg';
+import tailwindIcon from '/assets/icons/icons8-tailwind-css.svg';
+import htmlIcon from '/assets/icons/icons8-html.svg';
+import cssIcon from '/assets/icons/icons8-css.svg';
 
 export const projetos = [
 

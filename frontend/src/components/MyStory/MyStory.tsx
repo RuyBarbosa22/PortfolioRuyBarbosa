@@ -1,7 +1,7 @@
 import React from 'react';
-import ruy01 from '../../assets/images/ruy01.jpeg';
-import ruy02 from '../../assets/images/ruy02.jpeg';
-import ruy03 from '../../assets/images/ruy03.jpeg';
+import ruy01 from '/assets/images/ruy01.jpeg';
+import ruy02 from '/assets/images/ruy02.jpeg';
+import ruy03 from '/assets/images/ruy03.jpeg';
 import { PolaroidCarousel } from '../PolaroidCarousel/PolaroidCarousel';
 import { AnimatedStat } from '../AnimatedStat/AnimatedStat';
 

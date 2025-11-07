@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { translations } from '../../i18n';
 import type { Lang } from '../../i18n';
 
-import cardComunicacao from '../../assets/images/card_comunicação.jpeg';
-import cardCriatividade from '../../assets/images/card_criatividade.jpeg';
-import cardFlexibilidade from '../../assets/images/card_flexibilidade.jpeg';
-import cardSociemocional from '../../assets/images/card_sociemocional.jpeg';
+import cardComunicacao from '/assets/images/card_comunicação.jpeg';
+import cardCriatividade from '/assets/images/card_criatividade.jpeg';
+import cardFlexibilidade from '/assets/images/card_flexibilidade.jpeg';
+import cardSociemocional from '/assets/images/card_sociemocional.jpeg';
 
 interface SkillsProps {
   language: Lang;
@@ -49,7 +49,7 @@ export default function Skills({ language }: SkillsProps) {
             {t.skills?.heading ?? 'Soft Skills'}
           </h2>
           <p
-            className="text-gray-200 text-base text-justify w-full md:text-center  md:w-[80%] md:text-xl mx-auto leading-relaxed"
+            className="text-gray-200 text-base text-justify w-full md:text-xl mx-auto leading-relaxed"
             style={{ fontFamily: 'var(--font-roboto-mono)', color: 'rgba(229,229,234,0.9)' }}
           >
             {t.skills?.description ?? 'Essas são minhas principais soft skills e como eu as aplico na prática.'}

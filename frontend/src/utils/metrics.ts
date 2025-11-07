@@ -10,8 +10,5 @@ export async function postVisit(apiBase?: string) {
     });
   } catch (e) {
     // swallow errors - metrics must never break UX
-    // keep a debug log for development
-    // eslint-disable-next-line no-console
-    console.debug('postVisit failed', e);
   }
 }

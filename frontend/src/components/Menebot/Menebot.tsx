@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import menebotFrontImage from '../../assets/images/menebotFront.png';
-import menebotBlinkImage from '../../assets/images/menebotBlink.png';
-import wingLeftSvg from '../../assets/icons/menebot-wing-left.svg';
-import wingRightSvg from '../../assets/icons/menebot-wing-right.svg';
-import eyeSvg from '../../assets/icons/menebot-eye.svg';
-import closedEyeSvg from '../../assets/icons/menebot-closed-eye.svg';
+import menebotFrontImage from '/assets/images/menebotFront.png';
+import menebotBlinkImage from '/assets/images/menebotBlink.png';
+import wingLeftSvg from '/assets/icons/menebot-wing-left.svg';
+import wingRightSvg from '/assets/icons/menebot-wing-right.svg';
+import eyeSvg from '/assets/icons/menebot-eye.svg';
+import closedEyeSvg from '/assets/icons/menebot-closed-eye.svg';
 
 interface MenebotProps {
   className?: string;

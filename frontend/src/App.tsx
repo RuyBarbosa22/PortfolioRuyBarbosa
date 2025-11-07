@@ -9,31 +9,31 @@ import { Menebot } from "./components/Menebot/Menebot";
 import { TalkBox } from "./components/TalkBox/TalkBox";
 import type { TalkBoxHandle } from "./components/TalkBox/TalkBox";
 import { HeroLeft } from "./components/HeroLeft/HeroLeft";
-import scrollMouseIcon from "./assets/icons/scroll-mouse.svg";
+import scrollMouseIcon from "/assets/icons/scroll-mouse.svg";
 import { About } from "./components/About/About";
-import angularIcon from "./assets/icons/icons8-angular.svg";
-import springIcon from "./assets/icons/icons8-spring-logo.svg";
-import tsIcon from "./assets/icons/icons8-typescript.svg";
-import nodeIcon from "./assets/icons/node-js-svgrepo-com.svg";
+import angularIcon from "/assets/icons/icons8-angular.svg";
+import springIcon from "/assets/icons/icons8-spring-logo.svg";
+import tsIcon from "/assets/icons/icons8-typescript.svg";
+import nodeIcon from "/assets/icons/node-js-svgrepo-com.svg";
 import { MyStory } from "./components/MyStory/MyStory";
 import Skills from "./components/Skills/Skills";
 import { ChatWithMenebot } from "./components/ChatWithMenebot/ChatWithMenebot";
 import { MenebotChatProvider } from "./context/MenebotChatContext";
 import { useRef } from "react";
 import type { CarouselHandle } from "./components/ProjectsCarousel/Carousel";
-import htmlIcon from "./assets/icons/icons8-html.svg";
-import cssIcon from "./assets/icons/icons8-css.svg";
-import jsIcon from "./assets/icons/icons8-js.svg";
-import astroIcon from "./assets/icons/icons8-tailwind-css.svg";
-import reactIcon from "./assets/icons/react-svgrepo-com.svg";
-import kotlinIcon from "./assets/icons/icons8-kotlin.svg";
-import javaIcon from "./assets/icons/icons8-java.svg";
-import awsIcon from "./assets/icons/icons8-aws.svg";
-import mysqlIcon from "./assets/icons/mysql-svgrepo-com.svg";
-import leafIcon from "./assets/icons/swagger-svgrepo-com.svg";
-import pythonIcon from "./assets/icons/python-svgrepo-com.svg";
+import htmlIcon from "/assets/icons/icons8-html.svg";
+import cssIcon from "/assets/icons/icons8-css.svg";
+import jsIcon from "/assets/icons/icons8-js.svg";
+import astroIcon from "/assets/icons/icons8-tailwind-css.svg";
+import reactIcon from "/assets/icons/react-svgrepo-com.svg";
+import kotlinIcon from "/assets/icons/icons8-kotlin.svg";
+import javaIcon from "/assets/icons/icons8-java.svg";
+import awsIcon from "/assets/icons/icons8-aws.svg";
+import mysqlIcon from "/assets/icons/mysql-svgrepo-com.svg";
+import leafIcon from "/assets/icons/swagger-svgrepo-com.svg";
+import pythonIcon from "/assets/icons/python-svgrepo-com.svg";
 import Carousel from "./components/ProjectsCarousel/Carousel";
-import dockerIcon from "./assets/icons/docker-svgrepo-com.svg";
+import dockerIcon from "/assets/icons/docker-svgrepo-com.svg";
 import Footer from "./components/Footer/Footer";
 import ContactForm from "./components/ContactForm/ContactForm";
 
@@ -53,8 +53,12 @@ function App() {
   useEffect(() => {
     // dynamic import to keep startup fast and avoid bundling if not needed
     import('./utils/metrics').then(({ postVisit }) => {
-      postVisit().catch((e: any) => console.debug('metrics postVisit failed', e));
-    }).catch((e) => console.debug('metrics module load failed', e));
+      postVisit().catch(() => {
+        // Silent fail - metrics not critical
+      });
+    }).catch(() => {
+      // Silent fail
+    });
   }, []);
 
   // Array de mensagens do Menebot - traduções
@@ -206,7 +210,6 @@ function App() {
       <Navbar
         selectedLanguage={currentLanguage}
         onLanguageChange={(lang) => {
-          console.log("🔄 App: Recebendo mudança de idioma:", lang);
           setCurrentLanguage(lang);
         }}
       />
@@ -620,7 +623,7 @@ function App() {
           </div>
 
           {/* Pink bar with GitHub + carousel controls (all same size) */}
-          <div className="w-full flex items-center justify-center md:justify-between pr-6 md:pr-0 md:pl-8 lg:pl-12 lg:pr-12 xl:pl-0 xl:pr-12 mt-12 gap-4">
+          <div className="w-full flex items-center justify-center md:justify-between pr-6 md:pr-0 md:pl-0 lg:pl-0 lg:pr-12 xl:pl-0 xl:pr-12 mt-12 gap-4">
             <div className="hidden md:flex">
 
             <a

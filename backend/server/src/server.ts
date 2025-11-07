@@ -6,13 +6,280 @@ import { config } from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { Readable } from 'stream';
 import { tryIntentMatch } from './services/intent-matcher.js';
 
 config();
+
+// Email translations
+const emailTranslations = {
+  pt: {
+    subject: 'Seu código de verificação Menebot',
+    title: 'Código de verificação Menebot',
+    description: 'Use este código para validar seu e-mail e iniciar uma conversa com o Menebot.',
+    expiresMessage: 'Este código expira em',
+    minutes: '5 minutos',
+    warningText: 'Se você não solicitou este código, ignore este e-mail.',
+    footer: 'Menebot — criado por',
+    backToSite: 'Voltar ao site',
+    plainText: 'Seu código de verificação Menebot é: {code}\n\nEste código expira em 5 minutos.'
+  },
+  en: {
+    subject: 'Your Menebot verification code',
+    title: 'Menebot verification code',
+    description: 'Use this code to validate your email and start a conversation with Menebot.',
+    expiresMessage: 'This code expires in',
+    minutes: '5 minutes',
+    warningText: 'If you did not request this code, please ignore this email.',
+    footer: 'Menebot — created by',
+    backToSite: 'Back to site',
+    plainText: 'Your Menebot verification code is: {code}\n\nThis code expires in 5 minutes.'
+  },
+  es: {
+    subject: 'Tu código de verificación Menebot',
+    title: 'Código de verificación Menebot',
+    description: 'Usa este código para validar tu correo electrónico e iniciar una conversación con Menebot.',
+    expiresMessage: 'Este código expira en',
+    minutes: '5 minutos',
+    warningText: 'Si no solicitaste este código, ignora este correo electrónico.',
+    footer: 'Menebot — creado por',
+    backToSite: 'Volver al sitio',
+    plainText: 'Tu código de verificación Menebot es: {code}\n\nEste código expira en 5 minutos.'
+  }
+};
+
+// Contact confirmation email translations
+const contactEmailTranslations = {
+  pt: {
+    subject: 'Obrigado por entrar em contato!',
+    title: 'Mensagem recebida!',
+    greeting: 'Olá',
+    message: 'Recebi sua mensagem e entrarei em contato em breve.',
+    details: 'Detalhes da sua mensagem:',
+    subject_label: 'Assunto',
+    message_label: 'Mensagem',
+    footer: 'Atenciosamente, Ruy Barbosa de Castro',
+    backToSite: 'Voltar ao site',
+  },
+  en: {
+    subject: 'Thank you for contacting me!',
+    title: 'Message received!',
+    greeting: 'Hello',
+    message: 'I received your message and will get back to you soon.',
+    details: 'Your message details:',
+    subject_label: 'Subject',
+    message_label: 'Message',
+    footer: 'Best regards, Ruy Barbosa de Castro',
+    backToSite: 'Back to site',
+  },
+  es: {
+    subject: '¡Gracias por contactarme!',
+    title: '¡Mensaje recibido!',
+    greeting: 'Hola',
+    message: 'Recibí tu mensaje y me pondré en contacto pronto.',
+    details: 'Detalles de tu mensaje:',
+    subject_label: 'Asunto',
+    message_label: 'Mensaje',
+    footer: 'Atentamente, Ruy Barbosa de Castro',
+    backToSite: 'Volver al sitio',
+  }
+};
+
+// Function to generate email HTML based on language
+function generateEmailHtml(code: string, language: 'pt' | 'en' | 'es', frontendUrl: string): string {
+  const t = emailTranslations[language];
+  const langAttr = language === 'pt' ? 'pt-BR' : language === 'es' ? 'es-ES' : 'en-US';
+  
+  return `
+<!DOCTYPE html>
+<html lang="${langAttr}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${t.title}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a0a0a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #1a0b2e 0%, #0f0518 100%); border-radius: 16px; border: 1px solid rgba(125, 68, 255, 0.3); box-shadow: 0 8px 32px rgba(125, 68, 255, 0.15); overflow: hidden;">
+          
+          <!-- Header com Menebot -->
+          <tr>
+            <td style="padding: 40px 40px 30px; text-align: center;">
+              <!-- Emoji fallback centralizado, sem círculo -->
+              <div style="font-size: 64px; margin: 0 auto 20px; line-height: 1;">
+                🤖
+              </div>
+              <h1 style="color: #7d44ff; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.5px;">${t.title}</h1>
+            </td>
+          </tr>
+
+          <!-- Conteúdo -->
+          <tr>
+            <td style="padding: 0 40px 30px;">
+              <p style="color: #e5e5ea; font-size: 16px; line-height: 1.6; margin: 0 0 25px; text-align: center;">
+                ${t.description}
+              </p>
+            </td>
+          </tr>
+
+          <!-- Código de verificação -->
+          <tr>
+            <td style="padding: 0 40px 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7d44ff 100%); padding: 20px 40px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 16px rgba(125, 68, 255, 0.4);">
+                      <span style="color: #ffffff; font-size: 36px; font-weight: 700; letter-spacing: 8px; font-family: 'Courier New', monospace;">${code}</span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Aviso de expiração -->
+          <tr>
+            <td style="padding: 0 40px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(125, 68, 255, 0.1); border-radius: 8px; border: 1px solid rgba(125, 68, 255, 0.2);">
+                <tr>
+                  <td style="padding: 16px 20px; text-align: center;">
+                    <p style="color: #a78bfa; font-size: 14px; margin: 0; line-height: 1.5;">
+                      ⏱️ ${t.expiresMessage} <strong style="color: #c4b5fd;">${t.minutes}</strong>. ${t.warningText}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; border-top: 1px solid rgba(125, 68, 255, 0.2);">
+              <p style="color: #6b7280; font-size: 12px; line-height: 1.6; margin: 0; text-align: center;">
+                ${t.footer} <strong style="color: #9ca3af;">Ruy Barbosa de Castro</strong>
+              </p>
+              <p style="color: #6b7280; font-size: 12px; line-height: 1.6; margin: 8px 0 0; text-align: center;">
+                <a href="${frontendUrl}" style="color: #7d44ff; text-decoration: none;">${t.backToSite}</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+
+// Function to generate contact confirmation email HTML
+function generateContactConfirmationHtml(
+  name: string,
+  subject: string,
+  message: string,
+  language: 'pt' | 'en' | 'es',
+  frontendUrl: string
+): string {
+  const t = contactEmailTranslations[language];
+  const langAttr = language === 'pt' ? 'pt-BR' : language === 'es' ? 'es-ES' : 'en-US';
+  
+  return `
+<!DOCTYPE html>
+<html lang="${langAttr}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${t.title}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a0a0a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #1a0b2e 0%, #0f0518 100%); border-radius: 16px; border: 1px solid rgba(125, 68, 255, 0.3); box-shadow: 0 8px 32px rgba(125, 68, 255, 0.15); overflow: hidden;">
+          
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 30px; text-align: center;">
+              <div style="font-size: 64px; margin: 0 auto 20px; line-height: 1;">
+                ✉️
+              </div>
+              <h1 style="color: #7d44ff; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.5px;">${t.title}</h1>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding: 0 40px 20px;">
+              <p style="color: #e5e7eb; font-size: 16px; line-height: 1.6; margin: 0; text-align: center;">
+                ${t.greeting} <strong style="color: #c4b5fd;">${name}</strong>,
+              </p>
+            </td>
+          </tr>
+
+          <!-- Main message -->
+          <tr>
+            <td style="padding: 0 40px 30px;">
+              <p style="color: #d1d5db; font-size: 15px; line-height: 1.6; margin: 0; text-align: center;">
+                ${t.message}
+              </p>
+            </td>
+          </tr>
+
+          <!-- Message details box -->
+          <tr>
+            <td style="padding: 0 40px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(125, 68, 255, 0.1); border-radius: 12px; border: 1px solid rgba(125, 68, 255, 0.2);">
+                <tr>
+                  <td style="padding: 24px;">
+                    <p style="color: #a78bfa; font-size: 14px; font-weight: 600; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px;">
+                      ${t.details}
+                    </p>
+                    
+                    <p style="color: #9ca3af; font-size: 13px; margin: 0 0 6px; font-weight: 600;">
+                      ${t.subject_label}:
+                    </p>
+                    <p style="color: #e5e7eb; font-size: 15px; margin: 0 0 20px; line-height: 1.5;">
+                      ${subject}
+                    </p>
+                    
+                    <p style="color: #9ca3af; font-size: 13px; margin: 0 0 6px; font-weight: 600;">
+                      ${t.message_label}:
+                    </p>
+                    <p style="color: #e5e7eb; font-size: 15px; margin: 0; line-height: 1.6; white-space: pre-wrap;">
+                      ${message}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; border-top: 1px solid rgba(125, 68, 255, 0.2);">
+              <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin: 0 0 8px; text-align: center; font-weight: 500;">
+                ${t.footer}
+              </p>
+              <p style="color: #6b7280; font-size: 12px; line-height: 1.6; margin: 0; text-align: center;">
+                <a href="${frontendUrl}" style="color: #7d44ff; text-decoration: none; font-weight: 500;">${t.backToSite}</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
 
 interface Chunk {
   text: string;
@@ -381,52 +648,169 @@ async function startServer() {
     });
   });
 
+  // Get metrics (verified users count)
+  app.get('/api/metrics', async (req, res) => {
+    try {
+      // Scan DynamoDB to count verified users
+      const scanCmd = new ScanCommand({
+        TableName: DDB_TABLE,
+        FilterExpression: 'verified = :true',
+        ExpressionAttributeValues: marshall({ ':true': true }),
+        ProjectionExpression: 'email',
+      });
+      
+      const result = await ddbClient.send(scanCmd);
+      const verifiedUsers = (result.Items as any[])?.length || 0;
+
+      res.json({
+        verifiedUsers,
+        visits: verifiedUsers, // For backward compatibility
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      console.error('Error fetching metrics', error);
+      res.status(500).json({ message: 'Could not fetch metrics' });
+    }
+  });
+
+  // Post visit metric (currently no-op, but endpoint exists for frontend)
+  app.post('/api/metrics/visit', async (req, res) => {
+    try {
+      // For now, just acknowledge the visit
+      // In the future, could track anonymous visits in DDB
+      res.json({ ok: true });
+    } catch (error) {
+      console.error('Error recording visit', error);
+      res.status(500).json({ message: 'Could not record visit' });
+    }
+  });
+
+  // Check if user was recently authenticated (within 30 minutes)
+  app.post('/api/auth/check-recent', async (req, res) => {
+    try {
+      const { email } = req.body || {};
+      if (!email || typeof email !== 'string') {
+        return res.status(400).json({ message: 'Missing email' });
+      }
+
+      const getCmd = new GetItemCommand({ TableName: DDB_TABLE, Key: marshall({ email }) });
+      const existing = await ddbClient.send(getCmd);
+      
+      if (!existing || !existing.Item) {
+        return res.json({ recentlyAuthenticated: false });
+      }
+
+      const item = unmarshall(existing.Item as any) as any;
+      const now = Date.now();
+      const thirtyMinutes = 30 * 60 * 1000;
+
+      // Check if user is verified and was verified within last 30 minutes
+      if (item.verified && item.verifiedAt && (now - item.verifiedAt) < thirtyMinutes) {
+        return res.json({ recentlyAuthenticated: true });
+      }
+
+      return res.json({ recentlyAuthenticated: false });
+    } catch (error) {
+      console.error('Error checking recent auth', error);
+      return res.status(500).json({ message: 'Could not check authentication' });
+    }
+  });
+
   // Request verification code (step 1)
   app.post('/api/auth/request-code', async (req, res) => {
     try {
-      const { email } = req.body || {};
-      if (!email || typeof email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      const body = (req.body || {}) as { email?: unknown; language?: 'pt' | 'en' | 'es' };
+      const email = typeof body.email === 'string' ? body.email : undefined;
+      const langInput = body.language ?? 'pt';
+
+      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
         return res.status(400).json({ message: 'Invalid email' });
       }
 
-      // Basic rate-limiting per email: check existing item
+      const lang: 'pt' | 'en' | 'es' = ['pt', 'en', 'es'].includes(langInput) ? langInput : 'pt';
+
       const getCmd = new GetItemCommand({ TableName: DDB_TABLE, Key: marshall({ email }) });
       const existing = await ddbClient.send(getCmd);
       const now = Date.now();
+      let code = '';
+      
       if (existing && existing.Item) {
         const item = unmarshall(existing.Item as any) as any;
+        
+        // Enhanced rate limiting: 10 requests in 5 minutes
+        const fiveMinutes = 5 * 60 * 1000;
+        const requestHistory = item.requestHistory || [];
+        
+        // Filter requests within last 5 minutes
+        const recentRequests = requestHistory.filter((timestamp: number) => now - timestamp < fiveMinutes);
+        
+        if (recentRequests.length >= 10) {
+          return res.status(429).json({ message: 'Too many requests, try again in 5 minutes' });
+        }
+        
+        // Also check basic cooldown (1 minute between requests)
         if (item.lastSentAt && now - item.lastSentAt < 60_000) {
           return res.status(429).json({ message: 'Too many requests, try again later' });
         }
+        
+        // Update request history
+        recentRequests.push(now);
+        
+        // generate 6-digit numeric code
+        code = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = now + 5 * 60 * 1000; // 5 minutes
+
+        // Store/update item in DynamoDB with request history
+        const put = new PutItemCommand({
+          TableName: DDB_TABLE,
+          Item: marshall({
+            email,
+            code,
+            codeExpiresAt: expiresAt,
+            verified: item.verified || false,
+            verifiedAt: item.verifiedAt,
+            createdAt: item.createdAt,
+            lastSentAt: now,
+            requestHistory: recentRequests,
+          }, { removeUndefinedValues: true }),
+        });
+
+        await ddbClient.send(put);
+      } else {
+        // New user
+        code = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = now + 5 * 60 * 1000; // 5 minutes
+
+        const put = new PutItemCommand({
+          TableName: DDB_TABLE,
+          Item: marshall({
+            email,
+            code,
+            codeExpiresAt: expiresAt,
+            verified: false,
+            createdAt: now,
+            lastSentAt: now,
+            requestHistory: [now],
+          }, { removeUndefinedValues: true }),
+        });
+
+        await ddbClient.send(put);
       }
 
-      // generate 6-digit numeric code
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiresAt = now + 5 * 60 * 1000; // 5 minutes
+      // Send email via SES with styled HTML based on language
+      const t = emailTranslations[lang];
+      const bodyText = t.plainText.replace('{code}', code);
+      const bodyHtml = generateEmailHtml(code, lang, FRONTEND_URL);
 
-      // Store/update item in DynamoDB
-      const put = new PutItemCommand({
-        TableName: DDB_TABLE,
-        Item: marshall({
-          email,
-          code,
-          codeExpiresAt: expiresAt,
-          verified: false,
-          createdAt: existing && existing.Item ? unmarshall(existing.Item as any).createdAt : now,
-          lastSentAt: now,
-        }),
-      });
-
-      await ddbClient.send(put);
-
-      // Send email via SES
-      const bodyText = `Seu código de verificação Menebot é: ${code}\n\nEste código expira em 5 minutos.`;
       const sendCmd = new SendEmailCommand({
         Source: SES_FROM_EMAIL,
         Destination: { ToAddresses: [email] },
         Message: {
-          Subject: { Data: 'Seu código de verificação' },
-          Body: { Text: { Data: bodyText } },
+          Subject: { Data: t.subject },
+          Body: { 
+            Text: { Data: bodyText },
+            Html: { Data: bodyHtml }
+          },
         },
       });
 
@@ -488,7 +872,7 @@ async function startServer() {
       const updateParams = new UpdateItemCommand({
         TableName: DDB_TABLE,
         Key: marshall({ email }),
-        UpdateExpression: 'SET lastAccessAt = :now, currentSessionId = :sid, currentSessionStart = :now REMOVE code, codeExpiresAt, verifiedAt',
+        UpdateExpression: 'SET lastAccessAt = :now, currentSessionId = :sid, currentSessionStart = :now REMOVE code, codeExpiresAt',
         ExpressionAttributeValues: marshall({ ':now': now, ':sid': sessionId }),
       });
 
@@ -544,6 +928,81 @@ async function startServer() {
     } catch (error) {
       console.error('Error ending session', error);
       return res.status(500).json({ message: 'Could not end session' });
+    }
+  });
+
+  // Contact form endpoint
+  app.post('/api/contact', async (req, res) => {
+    try {
+      const { name, email, phone, subject, message, language } = req.body || {};
+      
+      // Validations
+      if (!name || !email || !phone || !subject || !message) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'Invalid email' });
+      }
+
+      // Phone validation (10-11 digits)
+      const phoneRegex = /^\d{10,11}$/;
+      const cleanPhone = phone.replace(/\D/g, '');
+      if (!phoneRegex.test(cleanPhone)) {
+        return res.status(400).json({ message: 'Invalid phone number' });
+      }
+
+      const lang: 'pt' | 'en' | 'es' = ['pt', 'en', 'es'].includes(language) ? language : 'pt';
+
+      // Send notification email to you (both addresses)
+      const notificationHtml = `
+        <h2>Nova mensagem de contato</h2>
+        <p><strong>Nome:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Telefone:</strong> ${phone}</p>
+        <p><strong>Assunto:</strong> ${subject}</p>
+        <p><strong>Mensagem:</strong></p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
+      `;
+
+      const notificationCmd = new SendEmailCommand({
+        Source: SES_FROM_EMAIL,
+        Destination: { 
+          ToAddresses: ['contato@ruybarbosa.dev', 'ruybarbao@gmail.com']
+        },
+        Message: {
+          Subject: { Data: `[Portfolio] ${subject}` },
+          Body: { 
+            Html: { Data: notificationHtml }
+          },
+        },
+      });
+
+      await sesClient.send(notificationCmd);
+
+      // Send confirmation email to user
+      const confirmationHtml = generateContactConfirmationHtml(name, subject, message, lang, FRONTEND_URL);
+      const t = contactEmailTranslations[lang];
+
+      const confirmationCmd = new SendEmailCommand({
+        Source: SES_FROM_EMAIL,
+        Destination: { ToAddresses: [email] },
+        Message: {
+          Subject: { Data: t.subject },
+          Body: { 
+            Html: { Data: confirmationHtml }
+          },
+        },
+      });
+
+      await sesClient.send(confirmationCmd);
+
+      return res.json({ ok: true });
+    } catch (error) {
+      console.error('Error sending contact email', error);
+      return res.status(500).json({ message: 'Could not send message' });
     }
   });
 

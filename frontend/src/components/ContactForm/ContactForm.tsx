@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import type { Lang } from "../../i18n";
 import { translations } from "../../i18n";
+import Toast from "../Toast/Toast";
 
 type Props = {
   currentLanguage: Lang;
@@ -19,6 +20,8 @@ export default function ContactForm({ currentLanguage }: Props) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Errors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const nameRef = useRef<HTMLInputElement | null>(null);
   const emailRef = useRef<HTMLInputElement | null>(null);
@@ -27,6 +30,7 @@ export default function ContactForm({ currentLanguage }: Props) {
   const messageRef = useRef<HTMLTextAreaElement | null>(null);
 
   const t = translations[currentLanguage].contactErrors;
+  const API_BASE = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
 
   const validate = (): Errors => {
     const out: Errors = {};
@@ -56,7 +60,7 @@ export default function ContactForm({ currentLanguage }: Props) {
     if (err.message && messageRef.current) return messageRef.current.focus();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const v = validate();
     setErrors(v);
     if (Object.keys(v).length > 0) {
@@ -64,19 +68,75 @@ export default function ContactForm({ currentLanguage }: Props) {
       return;
     }
 
-    // For now: just clear form and show success in console
-    console.log("Contact form valid - sending...", { name, email, phone, subject, message });
-    setName("");
-    setEmail("");
-    setPhone("");
-    setSubject("");
-    setMessage("");
-    setErrors({});
-    // Optionally show a toast / success message (not implemented here)
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const response = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.replace(/\D/g, ''),
+          subject: subject.trim(),
+          message: message.trim(),
+          language: currentLanguage,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      // Success - clear form and show success message
+      setSubmitStatus('success');
+      setName("");
+      setEmail("");
+      setPhone("");
+      setSubject("");
+      setMessage("");
+      setErrors({});
+
+      // Reset success message after 5 seconds
+      setTimeout(() => setSubmitStatus('idle'), 5000);
+    } catch (error) {
+      setSubmitStatus('error');
+      
+      // Reset error message after 5 seconds
+      setTimeout(() => setSubmitStatus('idle'), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="w-full">
+      {/* Toast notifications */}
+      {submitStatus === 'success' && (
+        <Toast
+          type="success"
+          message={
+            currentLanguage === 'pt' ? 'Mensagem enviada com sucesso! Verifique seu email.' : 
+            currentLanguage === 'en' ? 'Message sent successfully! Check your email.' :
+            '¡Mensaje enviado con éxito! Revisa tu correo electrónico.'
+          }
+          onClose={() => setSubmitStatus('idle')}
+        />
+      )}
+      
+      {submitStatus === 'error' && (
+        <Toast
+          type="error"
+          message={
+            currentLanguage === 'pt' ? 'Erro ao enviar mensagem. Tente novamente.' : 
+            currentLanguage === 'en' ? 'Error sending message. Please try again.' :
+            'Error al enviar mensaje. Inténtalo de nuevo.'
+          }
+          onClose={() => setSubmitStatus('idle')}
+        />
+      )}
+
       <div className="flex flex-col gap-6">
         <div className="w-full">
           {errors.name && (
@@ -175,9 +235,13 @@ export default function ContactForm({ currentLanguage }: Props) {
           <button
             onClick={handleSubmit}
             type="button"
-            className="w-full bg-gradient-to-r from-[#7D44FF] to-[#B321FA] text-white py-4 rounded-2xl font-semibold hover:brightness-105 transition"
+            disabled={isSubmitting}
+            className="w-full bg-gradient-to-r from-[#7D44FF] to-[#B321FA] text-white py-4 rounded-2xl font-semibold hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {translations[currentLanguage].contact.sendButton}
+            {isSubmitting 
+              ? (currentLanguage === 'pt' ? 'Enviando...' : currentLanguage === 'en' ? 'Sending...' : 'Enviando...')
+              : translations[currentLanguage].contact.sendButton
+            }
           </button>
         </div>
       </div>

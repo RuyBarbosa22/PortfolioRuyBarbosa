@@ -1,11 +1,12 @@
 import React from "react";
-import cvFile from "../../assets/content/CV - Ruy Barbosa.pdf";
 import { TypewriterText } from "../TypewriterText/TypewriterText";
 
 interface HeroLeftProps {
   onPrimaryClick?: () => void;
   language?: "pt" | "en" | "es";
 }
+
+const CV_FILE_URL = "/assets/content/CV-Ruy-Barbosa.pdf";
 
 export const HeroLeft: React.FC<HeroLeftProps> = ({
   onPrimaryClick,
@@ -133,7 +134,7 @@ export const HeroLeft: React.FC<HeroLeftProps> = ({
           {ctaPrimary}
         </button>
 
-  <a href={cvFile} download aria-label="Download CV" className="w-auto min-w-[200px] px-6 md:px-8 py-3 sm:py-3.5 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-semibold text-sm sm:text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap mx-auto sm:mx-0 lg:mx-0">
+  <a href={CV_FILE_URL} download="CV-Ruy-Barbosa.pdf" aria-label="Download CV" className="w-auto min-w-[200px] px-6 md:px-8 py-3 sm:py-3.5 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-semibold text-sm sm:text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap mx-auto sm:mx-0 lg:mx-0">
     {ctaDownload}
           <svg
             xmlns="http://www.w3.org/2000/svg"

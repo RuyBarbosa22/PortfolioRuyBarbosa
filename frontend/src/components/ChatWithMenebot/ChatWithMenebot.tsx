@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useMenebotChat } from '../../context/MenebotChatContext';
 import { postVisit } from '../../utils/metrics';
-import menebotFrente from '../../assets/content/menebot/menebot_frente.png';
-import menebotEsquerda from '../../assets/content/menebot/menebot_esquerda.png';
-import menebotDireita from '../../assets/content/menebot/menebot_direita.png';
-import menebotOlhoFechado from '../../assets/content/menebot/menebot_olho_fechado.png';
-import menebotPiscando from '../../assets/content/menebot/menebot_piscando.png';
-import menebotCima from '../../assets/content/menebot/menebot_cima.png';
-import menebotBaixo from '../../assets/content/menebot/menebot_baixo.png';
+import menebotFrente from '/assets/content/menebot/menebot_frente.png';
+import menebotEsquerda from '/assets/content/menebot/menebot_esquerda.png';
+import menebotDireita from '/assets/content/menebot/menebot_direita.png';
+import menebotOlhoFechado from '/assets/content/menebot/menebot_olho_fechado.png';
+import menebotPiscando from '/assets/content/menebot/menebot_piscando.png';
+import menebotCima from '/assets/content/menebot/menebot_cima.png';
+import menebotBaixo from '/assets/content/menebot/menebot_baixo.png';
 import { MenebotChat } from '../MenebotChat/MenebotChat';
 
 interface ChatWithMenebotProps {
@@ -30,8 +30,10 @@ interface ChatWithMenebotProps {
   ];
 
 // Counter banner component (6 digits) - fetches real metrics and animates to value
-const CounterBanner: React.FC = () => {
+const CounterBanner: React.FC<{ counterTitle: string }> = ({ counterTitle }) => {
   const [value, setValue] = useState(0);
+  const counterRef = React.useRef<HTMLDivElement>(null);
+  const hasAnimatedRef = React.useRef(false);
 
   useEffect(() => {
     const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
@@ -59,26 +61,25 @@ const CounterBanner: React.FC = () => {
 
     let mounted = true;
 
-    // If we have a recent value in sessionStorage, use it and avoid network calls
-    try {
-      const cached = sessionStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && parsed.ts && Date.now() - parsed.ts < CACHE_TTL) {
-          const base = Number(parsed.value ?? 0) || 0;
-          animateTo(base + 40);
-          return;
+    const fetchAndAnimate = async () => {
+      // If we have a recent value in sessionStorage, use it and avoid network calls
+      try {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.ts && Date.now() - parsed.ts < CACHE_TTL) {
+            const base = Number(parsed.value ?? 0) || 0;
+            animateTo(base + 40);
+            return;
+          }
         }
+      } catch (e) {
+        // ignore storage errors
       }
-    } catch (e) {
-      // ignore storage errors
-    }
 
-    // Retry logic: try multiple times before falling back
-    (async () => {
+      // Retry logic: try multiple times before falling back
       const attempts = 4;
       const delays = [500, 1000, 2000, 3000];
-      let lastError: any = null;
       for (let i = 0; i < attempts; i++) {
         try {
           const res = await fetch(`${API_BASE}/api/metrics`, { credentials: 'include' });
@@ -98,28 +99,53 @@ const CounterBanner: React.FC = () => {
           animateTo(target);
           return;
         } catch (err) {
-          lastError = err;
           // wait before next attempt (if any)
           if (i < delays.length) await new Promise((r) => setTimeout(r, delays[i]));
         }
       }
-      console.debug('Could not fetch metrics after retries, falling back to 140', lastError);
       if (!mounted) return;
       animateTo(140);
-    })();
+    };
+
+    // Intersection Observer: only trigger animation when element is visible
+    if (!counterRef.current) {
+      return;
+    }
+
+    if (hasAnimatedRef.current) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimatedRef.current) {
+            hasAnimatedRef.current = true;
+            fetchAndAnimate();
+          }
+        });
+      },
+      {
+        threshold: 0.3, // Trigger when 30% of the element is visible
+        rootMargin: '0px'
+      }
+    );
+
+    observer.observe(counterRef.current);
 
     return () => {
       mounted = false;
       if (rafId) cancelAnimationFrame(rafId);
+      observer.disconnect();
     };
   }, []);
 
   const display = String(value).padStart(6, '0');
 
   return (
-    <div className="w-full flex justify-center mt-12">
-      <div className="text-center">
-        <h3 className="text-lg md:text-xl font-semibold text-[var(--color-primary)] mb-2">Usuários que já testaram o Menebot!</h3>
+    <div ref={counterRef} className="w-full flex justify-center mt-12">
+      <div className="text-center w-full">
+        <h3 className="text-lg md:text-xl font-semibold text-[var(--color-primary)] mb-2 text-center">{counterTitle}</h3>
         <div className="font-['Roboto_Mono',monospace] text-4xl md:text-6xl font-extrabold tracking-[0.06em] text-white">
           {display}
         </div>
@@ -138,7 +164,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   const [showConfirmClose, setShowConfirmClose] = useState(false);
   const [pendingSection, setPendingSection] = useState<string | null>(null); // para navegação futura
   const [savedEmail, setSavedEmail] = useState(''); // Email salvo para o chat
-  const [step, setStep] = useState<'enter-email'|'enter-code'|'validated'>('enter-email');
+  const [step, setStep] = useState<'enter-email'|'enter-code'|'validated'|'welcome-back'>('enter-email');
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -147,7 +173,28 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
   const [sessionId, setSessionId] = useState<string | null>(null);
 
-  const contentByLang: Record<string, { title: string; description: string; buttonText: string; modalTitle: string; modalDescription: string; modalButton: string; invalidEmail: string; successMessage: string; chatButton: string }> = {
+  const contentByLang: Record<string, { 
+    title: string; 
+    description: string; 
+    buttonText: string; 
+    modalTitle: string; 
+    modalDescription: string; 
+    modalButton: string; 
+    invalidEmail: string; 
+    successMessage: string; 
+    chatButton: string;
+    counterTitle: string;
+    verifyEmailTitle: string;
+    verifyButton: string;
+    invalidCode: string;
+    codeExpired: string;
+    networkError: string;
+    sendingCode: string;
+    finalizing: string;
+    tooManyRequests: string;
+    welcomeBack: string;
+    welcomeBackMessage: string;
+  }> = {
     pt: {
       title: 'Fale com o menebot!',
       description: 'Criei um chatbot super bacana para o meu portfólio, usando os serviços da AWS e muita programação em Typescript. Ele acessa um PDF cheio de informações sobre mim e está pronto para responder suas perguntas sobre minhas habilidades e experiências. Quer saber mais sobre meu trabalho de um jeito divertido e interativo? Converse com o Menebot e descubra como minhas competências podem brilhar em diferentes contextos profissionais! Vai lá, experimente e se surpreenda!',
@@ -157,7 +204,18 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       modalButton: 'Prosseguir',
       invalidEmail: 'Email inválido. Por favor, verifique e tente novamente.',
       successMessage: 'Você já pode testar essa funcionalidade',
-      chatButton: 'Conversar com menebot'
+      chatButton: 'Conversar com menebot',
+      counterTitle: 'Usuários que já testaram o Menebot!',
+      verifyEmailTitle: 'Verifique seu e-mail',
+      verifyButton: 'Verificar',
+      invalidCode: 'Código inválido',
+      codeExpired: 'Código expirado ou não encontrado',
+      networkError: 'Erro de rede. Tente novamente.',
+      sendingCode: 'Enviando...',
+      finalizing: 'Finalizando...',
+      tooManyRequests: 'Muitas tentativas. Tente novamente em 5 minutos.',
+      welcomeBack: 'Bem-vindo de volta!',
+      welcomeBackMessage: 'Você já está autenticado. Vamos conversar?'
     },
     en: {
       title: 'Chat with Menebot!',
@@ -168,7 +226,18 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       modalButton: 'Continue',
       invalidEmail: 'Invalid email. Please check and try again.',
       successMessage: 'You can now test this feature',
-      chatButton: 'Start chatting with Menebot'
+      chatButton: 'Start chatting with Menebot',
+      counterTitle: 'Users who have tested Menebot!',
+      verifyEmailTitle: 'Verify your email',
+      verifyButton: 'Verify',
+      invalidCode: 'Invalid code',
+      codeExpired: 'Code expired or not found',
+      networkError: 'Network error. Please try again.',
+      sendingCode: 'Sending...',
+      finalizing: 'Finalizing...',
+      tooManyRequests: 'Too many attempts. Please try again in 5 minutes.',
+      welcomeBack: 'Welcome back!',
+      welcomeBackMessage: 'You are already authenticated. Let\'s chat?'
     },
     es: {
       title: '¡Chatea con Menebot!',
@@ -179,7 +248,18 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       modalButton: 'Continuar',
       invalidEmail: 'Correo electrónico no válido. Por favor, verifica e inténtalo de nuevo.',
       successMessage: 'Ya puedes probar esta función',
-      chatButton: 'Empezar a chatear con Menebot'
+      chatButton: 'Empezar a chatear con Menebot',
+      counterTitle: '¡Usuarios que han probado Menebot!',
+      verifyEmailTitle: 'Verifica tu correo electrónico',
+      verifyButton: 'Verificar',
+      invalidCode: 'Código inválido',
+      codeExpired: 'Código expirado o no encontrado',
+      networkError: 'Error de red. Inténtalo de nuevo.',
+      sendingCode: 'Enviando...',
+      finalizing: 'Finalizando...',
+      tooManyRequests: 'Demasiados intentos. Inténtalo de nuevo en 5 minutos.',
+      welcomeBack: '¡Bienvenido de vuelta!',
+      welcomeBackMessage: 'Ya estás autenticado. ¿Hablamos?'
     }
   };
 
@@ -190,7 +270,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
     return emailRegex.test(email);
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     setEmailError('');
     setCodeError('');
 
@@ -199,30 +279,53 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       return;
     }
 
-    // Request verification code from backend
+    // Check if user was recently authenticated (within 30 minutes)
     setIsLoading(true);
+    try {
+      const checkRes = await fetch(`${API_BASE}/api/auth/check-recent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (checkRes.ok) {
+        const data = await checkRes.json();
+        if (data.recentlyAuthenticated) {
+          // User was authenticated recently, show welcome back screen
+          setIsLoading(false);
+          setStep('welcome-back');
+          return;
+        }
+      }
+    } catch (err) {
+      // Continue with normal flow if check fails
+    }
+
+    // Request verification code from backend
     fetch(`${API_BASE}/api/auth/request-code`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, language: language || 'pt' }),
     })
       .then(async (res) => {
         setIsLoading(false);
         if (!res.ok) {
           const j = await res.json().catch(() => ({}));
-          setEmailError(j.message || 'Erro ao enviar código');
+          // Handle too many requests (429)
+          if (res.status === 429) {
+            setEmailError(content.tooManyRequests);
+          } else {
+            setEmailError(j.message || content.networkError);
+          }
           return;
         }
         // move to code entry step
         setStep('enter-code');
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         setIsLoading(false);
-        setEmailError('Erro de rede. Tente novamente.');
+        setEmailError(content.networkError);
       });
-      ;
-
   };
 
   const handleOpenModal = () => {
@@ -285,7 +388,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
           });
         }
       } catch (e) {
-        console.error('Failed to end session', e);
+        // Silent fail - session end is not critical
       }
       doCloseChat();
       // Se veio do menu, rolar para a seção após fechar
@@ -328,8 +431,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
         setGlobalChatOpen(true);
         handleCloseModal();
       }, 300);
-    } catch (err) {
-      console.error(err);
+    } catch {
       setIsLoading(false);
       setEmailError('Erro de rede ao iniciar sessão');
     }
@@ -442,7 +544,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
           </div>
 
           {/* Contador centralizado (6 dígitos) - mostra abaixo do CTA e centralizado em todas as resoluções */}
-          <CounterBanner />
+          <CounterBanner counterTitle={content.counterTitle} />
         </div>
       </div>
 
@@ -464,7 +566,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                 </h3>
                 
                 {/* Descrição */}
-                <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-6 max-w-[800px] md:mx-auto text-justify lg:text-center">
+                <p className="text-sm sm:text-base md:text-lg text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-6 text-center">
                   {content.modalDescription}
                 </p>
 
@@ -491,8 +593,27 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                   disabled={isLoading}
                   className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-4 disabled:opacity-60"
                 >
-                  {isLoading ? 'Enviando...' : content.modalButton}
+                  {isLoading ? content.sendingCode : content.modalButton}
                 </button>
+              </>
+            ) : step === 'welcome-back' ? (
+              // Welcome back screen - user was recently authenticated
+              <>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <svg className="w-12 h-12 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white text-center">{content.welcomeBack}</h3>
+                  <p className="text-gray-300 text-center">{content.welcomeBackMessage}</p>
+                  <button
+                    onClick={handleChatWithMenebot}
+                    className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-2"
+                  >
+                    {content.chatButton}
+                  </button>
+                </div>
               </>
             ) : step === 'enter-code' && !isValidated ? (
               <>
@@ -511,12 +632,12 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                 {isFinalizing && (
                   <div className="flex flex-col items-center gap-2 mb-4">
                     <div className="w-8 h-8 border-2 border-t-transparent border-white rounded-full animate-spin" />
-                    <p className="text-sm text-gray-300">Finalizando...</p>
+                    <p className="text-sm text-gray-300">{content.finalizing}</p>
                   </div>
                 )}
 
                 {/* Enter verification code */}
-                <h4 className="text-white font-semibold text-center mb-3">Verifique seu e-mail</h4>
+                <h4 className="text-white font-semibold text-center mb-3">{content.verifyEmailTitle}</h4>
                 <input
                   type="text"
                   value={code}
@@ -532,7 +653,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                       onClick={async () => {
                         setCodeError('');
                         if (!code || code.trim().length < 4) {
-                          setCodeError('Código inválido');
+                          setCodeError(content.invalidCode);
                           return;
                         }
 
@@ -549,7 +670,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                           setIsLoading(false);
                           if (!res.ok) {
                             const j = await res.json().catch(() => ({}));
-                            setCodeError(j.message || 'Falha ao verificar código');
+                            setCodeError(j.message || content.codeExpired);
                             return;
                           }
 
@@ -565,20 +686,21 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                             setStep('validated');
                             // report visit after successful verification (only once per modal/session)
                             if (!visitSentAfterVerify) {
-                              postVisit().catch((e) => console.debug('postVisit after verify failed', e));
+                              postVisit().catch(() => {
+                                // Silent fail - metrics not critical
+                              });
                               setVisitSentAfterVerify(true);
                             }
                           }, extraDelay);
                         } catch (err) {
-                          console.error(err);
                           setIsLoading(false);
-                          setCodeError('Erro de rede. Tente novamente.');
+                          setCodeError(content.networkError);
                         }
                       }}
                       disabled={isFinalizing || isLoading}
                       className="w-full bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg disabled:opacity-60"
                     >
-                      Verificar
+                      {content.verifyButton}
                     </button>
                 </div>
                 {/* O botão de abrir o chat não deve ser exibido enquanto o usuário não estiver validado.
@@ -594,7 +716,6 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold text-white text-center">{content.successMessage}</h3>
-                  <p className="text-sm text-gray-300 text-center">{content.modalDescription}</p>
                   <button
                     onClick={handleChatWithMenebot}
                     className="w-full bg-[var(--color-primary)] hover:bg-[#6D3FE8] text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 mt-2"

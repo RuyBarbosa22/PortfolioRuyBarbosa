@@ -130,6 +130,37 @@
   }
 }
 
+/* Toast animations - slide from left */
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-400px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-400px);
+    opacity: 0;
+  }
+}
+
+.animate-slideInFromLeft {
+  animation: slideInFromLeft 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slideOutToLeft {
+  animation: slideOutToLeft 300ms cubic-bezier(0.4, 0, 1, 1);
+}
+
 /* Animação dos Zs flutuando quando Menebot está dormindo */
 @keyframes floatZ {
   0% {

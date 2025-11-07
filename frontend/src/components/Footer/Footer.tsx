@@ -1,11 +1,12 @@
 import React from "react";
-import cvFile from "../../assets/content/CV - Ruy Barbosa.pdf";
 import { translations } from "../../i18n";
 import { FaWhatsapp, FaGithub, FaLinkedin } from 'react-icons/fa';
 
 type Props = {
   language?: "pt" | "en" | "es";
 };
+
+const CV_FILE_URL = "/assets/content/CV-Ruy-Barbosa.pdf";
 
 export const Footer: React.FC<Props> = ({ language = "pt" }) => {
   const t = translations[language].footer || translations.pt.footer;
@@ -32,7 +33,7 @@ export const Footer: React.FC<Props> = ({ language = "pt" }) => {
               </a>
 
               {/* Resume download - use embedded asset */}
-              <a href={cvFile} download className="text-sm text-white/80 hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2" aria-label="Download CV">
+              <a href={CV_FILE_URL} download="CV-Ruy-Barbosa.pdf" className="text-sm text-white/80 hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2" aria-label="Download CV">
                 {t.linkResume}
               </a>
 
