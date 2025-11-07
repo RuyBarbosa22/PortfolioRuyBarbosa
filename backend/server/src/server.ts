@@ -327,6 +327,7 @@ const ddbClient = new DynamoDBClient({ region: AWS_REGION });
 // DynamoDB table name (store user verification + emails)
 const DDB_TABLE = process.env.DDB_TABLE_NAME || 'menebot_users';
 const SES_FROM_EMAIL = process.env.SES_FROM_EMAIL || `no-reply@${process.env.FRONTEND_URL?.replace(/https?:\/\//,'') || 'example.com'}`;
+const SES_CONTACT_EMAILS = process.env.SES_CONTACT_EMAILS?.split(',').map(e => e.trim()) || ['contato@ruybarbosa.dev', 'ruybarbao@gmail.com'];
 
 // Cache de embeddings em memória
 let embeddingsCache: Chunk[] = [];
@@ -970,7 +971,7 @@ async function startServer() {
       const notificationCmd = new SendEmailCommand({
         Source: SES_FROM_EMAIL,
         Destination: { 
-          ToAddresses: ['contato@ruybarbosa.dev', 'ruybarbao@gmail.com']
+          ToAddresses: SES_CONTACT_EMAILS
         },
         Message: {
           Subject: { Data: `[Portfolio] ${subject}` },
