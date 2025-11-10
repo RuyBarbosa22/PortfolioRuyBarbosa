@@ -16,7 +16,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
   const contentByLang: Record<string, { title: string; description: string; stats: Array<{ value: string; label: string }> }> = {
     pt: {
       title: 'Minha história',
-      description: 'Olá! Sou de São Paulo (SP), formado em Desenvolvimento de Sistemas pela Etec Doutor José Coury e atualmente cursando Sistemas de Informação na SPTech School. Nascido em 17 de novembro de 2003, adoro explorar novas experiências e jogar. Escolhi ser programador pela liberdade de viajar e a qualidade de vida. Sou criativo, simpático e detalhista, sempre buscando aprender e melhorar. Estou animado para contribuir com minhas habilidades e enfrentar novos desafios!',
+      description: 'Olá! Sou de São Paulo (SP), formado em Desenvolvimento de Sistemas pela Etec de Guaianases e atualmente cursando Sistemas de Informação na SPTech School. Nascido em 17 de novembro de 2003, adoro explorar novas experiências e jogar. Escolhi ser programador pela liberdade de viajar e a qualidade de vida. Sou criativo, comunicativo e resiliente, sempre buscando aprender e melhorar. Estou animado para contribuir com minhas habilidades e enfrentar novos desafios!',
         stats: [
         { value: '4+', label: 'Anos de experiência' },
         { value: '8+', label: 'Projetos realizados' },
@@ -26,7 +26,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
     },
     en: {
       title: 'My story',
-      description: 'Hello! I\'m from São Paulo (SP), graduated in Systems Development from Etec Doutor José Coury and currently studying Information Systems at SPTech School. Born on November 17, 2003, I love exploring new experiences and gaming. I chose to be a programmer for the freedom to travel and quality of life. I\'m creative, friendly and detail-oriented, always seeking to learn and improve. I\'m excited to contribute my skills and face new challenges!',
+      description: 'Hello! I\'m from São Paulo (SP), graduated in Systems Development from Etec de Guaianases and currently studying Information Systems at SPTech School. Born on November 17, 2003, I love exploring new experiences and gaming. I chose to be a programmer for the freedom to travel and quality of life. I\'m creative, communicative, and resilient, always seeking to learn and improve. I\'m excited to contribute my skills and face new challenges!',
         stats: [
         { value: '4+', label: 'Years of experience' },
         { value: '8+', label: 'Projects completed' },
@@ -36,7 +36,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
     },
     es: {
       title: 'Mi historia',
-      description: '¡Hola! Soy de São Paulo (SP), graduado en Desarrollo de Sistemas por Etec Doutor José Coury y actualmente estudiando Sistemas de Información en SPTech School. Nacido el 17 de noviembre de 2003, me encanta explorar nuevas experiencias y jugar. Elegí ser programador por la libertad de viajar y la calidad de vida. Soy creativo, simpático y detallista, siempre buscando aprender y mejorar. ¡Estoy emocionado de contribuir con mis habilidades y enfrentar nuevos desafíos!',
+      description: '¡Hola! Soy de São Paulo (SP), graduado en Desarrollo de Sistemas por Etec de Guaianases y actualmente estudiando Sistemas de Información en SPTech School. Nacido el 17 de noviembre de 2003, me encanta explorar nuevas experiencias y jugar. Elegí ser programador por la libertad de viajar y la calidad de vida. Soy creativo, comunicativo y resiliente, siempre buscando aprender y mejorar. ¡Estoy emocionado de contribuir con mis habilidades y enfrentar nuevos desafíos!',
         stats: [
         { value: '4+', label: 'Años de experiencia' },
         { value: '8+', label: 'Proyectos realizados' },

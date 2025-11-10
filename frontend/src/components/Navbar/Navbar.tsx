@@ -157,7 +157,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
         transition-transform duration-300 ease-out z-[50]
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex flex-col gap-6 p-6 pt-20">
+        <div className="flex flex-col gap-6 p-6 pt-20 h-full overflow-y-auto overflow-x-visible">
           {/* Mobile Nav Links */}
           {navLinks.map((link) => (
             <a
@@ -189,7 +189,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
             </a>
           ))}
 
-          {/* Mobile Social Icons */}
+          {/* Mobile Social Icons + Language Toggle */}
           <div className="relative flex gap-3 items-center pt-6 border-t border-[var(--color-primary)]/20">
             {[
               { icon: FaWhatsapp, label: 'WhatsApp', href: 'https://wa.me/5511946706513?text=Ol%C3%A1%20Ruy!%20Vim%20pelo%20seu%20portf%C3%B3lio%2C%20vamos%20conversar%3F' },
@@ -208,7 +208,7 @@ export function Navbar({ selectedLanguage, onLanguageChange }: NavbarProps) {
               </a>
             ))}
             
-            {/* Mobile Language Toggle */}
+            {/* Mobile Language Toggle - Same row as social icons */}
             <button
               ref={languageToggleRef}
               onClick={(e) => {
