@@ -13,17 +13,19 @@ interface Message {
 interface MenebotChatProps {
   email: string;
   onClose: () => void;
+  onForceClose?: () => void; // Fecha direto sem confirmação
   language?: 'pt' | 'en' | 'es';
 }
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
 
-export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, language = 'pt' }) => {
+export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, onForceClose, language = 'pt' }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [terminateMessage, setTerminateMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +39,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
     typing: string; 
     welcomeMessage: string;
     suggestedQuestions: string[];
+    terminateOk: string;
   }> = {
     pt: {
       title: 'Menebot',
@@ -51,6 +54,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
         'Como você se imagina profissionalmente nos próximos 2 a 3 anos?',
         'O que te motiva na área de tecnologia hoje?',
       ],
+      terminateOk: 'OK',
     },
     en: {
       title: 'Menebot',
@@ -65,6 +69,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
         'How do you see yourself professionally in the next 2 to 3 years?',
         'What motivates you in the tech field today?',
       ],
+      terminateOk: 'OK',
     },
     es: {
       title: 'Menebot',
@@ -79,6 +84,7 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
         '¿Cómo te ves profesionalmente en los próximos 2 a 3 años?',
         '¿Qué te motiva en el área de tecnología hoy?',
       ],
+      terminateOk: 'OK',
     },
   };
 
@@ -169,6 +175,11 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
       }
     });
 
+    newSocket.on('terminate', (data: { message: string; language: string }) => {
+      setIsTyping(false);
+      setTerminateMessage(data.message);
+    });
+
     setSocket(newSocket);
 
     return () => {
@@ -226,6 +237,16 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSendMessage();
+    }
+  };
+
+  const handleTerminateClose = () => {
+    setTerminateMessage(null);
+    // Usa onForceClose se disponível, senão usa onClose
+    if (onForceClose) {
+      onForceClose(); // Fecha direto sem confirmação
+    } else {
+      onClose(); // Fallback para comportamento padrão
     }
   };
 
@@ -357,6 +378,30 @@ export const MenebotChat: React.FC<MenebotChatProps> = ({ email, onClose, langua
           )}
         </div>
       </div>
+
+      {/* Terminate Modal */}
+      {terminateMessage && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm rounded-2xl">
+          <div className="bg-gradient-to-br from-red-900/90 to-black border-2 border-red-500/50 rounded-xl p-8 max-w-md mx-4 shadow-2xl shadow-red-500/30">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+                <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <p className="text-white text-base font-['Roboto_Mono',monospace] leading-relaxed mb-6">
+                {terminateMessage}
+              </p>
+              <button
+                onClick={handleTerminateClose}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-['Roboto_Mono',monospace] shadow-lg shadow-red-500/30"
+              >
+                {content.terminateOk}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

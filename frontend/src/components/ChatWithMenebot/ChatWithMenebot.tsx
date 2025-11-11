@@ -736,30 +736,31 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
           <MenebotChat
             email={savedEmail}
             onClose={() => handleRequestCloseChat()}
+            onForceClose={doCloseChat}
             language={language}
           />
           {/* Modal de confirmação de saída */}
           {showConfirmClose && (
-            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fadeIn">
-              <div className="relative bg-gradient-to-br from-[#181825] to-black border border-[var(--color-primary)]/40 rounded-2xl px-8 py-10 max-w-md w-full shadow-2xl shadow-[var(--color-primary)]/20 flex flex-col items-center animate-fadeInUp">
-                <h3 className="text-2xl font-extrabold text-white mb-3 text-center font-['Montserrat',sans-serif] tracking-tight drop-shadow-[0_2px_12px_rgba(125,68,255,0.25)]">
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fadeIn p-4">
+              <div className="relative bg-gradient-to-br from-[#181825] to-black border border-[var(--color-primary)]/40 rounded-2xl px-6 sm:px-8 py-8 sm:py-10 max-w-md w-full shadow-2xl shadow-[var(--color-primary)]/20 flex flex-col items-center animate-fadeInUp">
+                <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-3 text-center font-['Montserrat',sans-serif] tracking-tight drop-shadow-[0_2px_12px_rgba(125,68,255,0.25)]">
                   {language === 'en' ? 'Do you really want to leave?' : language === 'es' ? '¿Realmente deseas salir?' : 'Deseja realmente sair?'}
                 </h3>
-                <p className="text-base text-gray-300 text-center mb-7 font-['Roboto_Mono',monospace]">
+                <p className="text-sm sm:text-base text-gray-300 text-center mb-6 sm:mb-7 font-['Roboto_Mono',monospace]">
                   {language === 'en' ? 'You will lose this conversation.' : language === 'es' ? 'Perderás esta conversación.' : 'Você perderá essa conversa.'}
                 </p>
-                <div className="flex gap-4 w-full justify-center">
+                <div className="flex flex-row gap-3 sm:gap-4 w-full justify-center">
                   {/* Botão NÃO: solid, igual HeroSection */}
                   <button
                     onClick={handleCancelClose}
-                    className="w-auto min-w-[120px] px-6 md:px-8 py-3 bg-[var(--color-primary)] text-white font-semibold text-base rounded-full hover:bg-[var(--color-primary-light)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.6)] transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap"
+                    className="w-24 sm:w-auto sm:min-w-[120px] px-4 sm:px-6 md:px-8 py-3 bg-[var(--color-primary)] text-white font-semibold text-sm sm:text-base rounded-full hover:bg-[var(--color-primary-light)] hover:drop-shadow-[0_0_12px_rgba(125,68,255,0.6)] transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     {language === 'en' ? 'No' : language === 'es' ? 'No' : 'Não'}
                   </button>
                   {/* Botão SIM: outline, igual HeroSection */}
                   <button
                     onClick={handleConfirmClose}
-                    className="w-auto min-w-[120px] px-6 md:px-8 py-3 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-semibold text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap"
+                    className="w-24 sm:w-auto sm:min-w-[120px] px-4 sm:px-6 md:px-8 py-3 bg-transparent border-2 border-[var(--color-primary)]/60 text-white font-semibold text-sm sm:text-base rounded-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:shadow-[0_0_16px_rgba(125,68,255,0.5),0_0_8px_rgba(125,68,255,0.3)] hover:-translate-y-px whitespace-nowrap"
                   >
                     {language === 'en' ? 'Yes' : language === 'es' ? 'Sí' : 'Sim'}
                   </button>
