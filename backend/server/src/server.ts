@@ -31,13 +31,13 @@ const SHITWORDS = {
   ],
   "pt-BR": [
     // originais
-    "merda","bosta","bicha","viado","viadinho", "porra", "caralho", "fodase", "foda-se", "vai se foder", "foder",
+    "merda","bosta","bicha","viado","viadinho", "porra", "caralho", "fodase", "foda-se", "vai se foder", "foder", "fuder",
     "filho da puta", "filha da puta", "puta", "vadia", "piranha", "buceta",
     "bunda", "cu", "vai tomar no cu", "pau no cu", "desgraça", "otário", "otaria",
     "babaca", "idiota", "vagabundo", "corno", "seu merda",
     // adicionados
     "puta que pariu", "caralho do caralho", "porra nenhuma", "caguei",
-    "vai se danar", "vai se catar", "se foda", "se fode", "merdinha", "bosta",
+    "vai se danar", "vai se catar", "se foda", "se fode", "merdinha",
     "cuzão", "cuzao", "cuzao do caralho", "arrombado", "filho da puta de merda",
     "palhaço", "palhaça", "mané", "manézinho", "babaca do caralho", "paspalho",
     "idiota do caralho", "otário do caralho", "maricas"
