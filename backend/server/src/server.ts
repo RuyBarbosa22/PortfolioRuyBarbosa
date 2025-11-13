@@ -14,73 +14,111 @@ import { tryIntentMatch } from './services/intent-matcher.js';
 
 config();
 
-// Profanity detection - SHITWORDS fallback
+// Profanity detection - SHITWORDS refined and expanded
 const SHITWORDS = {
   "es-AR": [
-    // originais
-    "mierda", "puta", "puto", "puta madre", "hijo de puta", "hijo de la gran puta",
-    "la concha de tu madre", "la reconcha de tu madre", "forro", "boludo", "boluda",
-    "pelotudo", "pelotuda", "gil", "idiota", "imbécil", "andate a la mierda",
-    "chupame un huevo", "me chupa un huevo", "carajo", "coño", "zorra", "pendejo", "pendeja",
-    // adicionados
-    "vete a la mierda", "que te jodan", "que te den", "joder", "jodete",
-    "me cago en la puta", "me cago en todo", "hijo de mil putas", "come mierda",
-    "putamadre", "culiao", "culiá", "cagada", "cagar", "capo de mierda",
-    "mamón", "mamona", "pelotudo de mierda", "bolu", "forro de mierda",
-    "mierdita", "apestoso", "asqueroso"
+    // Clássicos e Gírias Argentinas
+    "mierda", "puta", "puto", "puta madre", "hijo de puta", "hijo de la gran puta", "hijo de mil putas",
+    "la concha de tu madre", "la reconcha de tu madre", "concha de tu madre", "concha",
+    "forro", "forro de mierda", "boludo", "boluda", "bolu", 
+    "pelotudo", "pelotuda", "pelotudo de mierda", 
+    "gil", "gil de mierda", "mogolico", "mogólica", "tarado", "tarada",
+    "idiota", "imbécil", "estupido", "estupida",
+    "andate a la mierda", "vete a la mierda", 
+    "chupame un huevo", "me chupa un huevo", "chupa pija", "chupala",
+    "carajo", "coño", "zorra", "pendejo", "pendeja", "pajero", "pajera",
+    "que te jodan", "que te den", "joder", "jodete",
+    "me cago en la puta", "me cago en todo", "come mierda",
+    "culiao", "culiá", "cagada", "cagar", "capo de mierda",
+    "mamón", "mamona", "sorete", "trolo", "cagon", "cagón", "orto", "culo",
+    "basura", "inservible", "inutil", "pete", "pito", "verga"
   ],
   "pt-BR": [
-    // originais
-    "merda","bosta","bicha","viado","viadinho", "porra", "caralho", "fodase", "foda-se", "vai se foder", "foder", "fuder",
-    "filho da puta", "filha da puta", "puta", "vadia", "piranha", "buceta",
-    "bunda", "cu", "vai tomar no cu", "pau no cu", "desgraça", "otário", "otaria",
-    "babaca", "idiota", "vagabundo", "corno", "seu merda",
-    // adicionados
-    "puta que pariu", "caralho do caralho", "porra nenhuma", "caguei",
-    "vai se danar", "vai se catar", "se foda", "se fode", "merdinha",
-    "cuzão", "cuzao", "cuzao do caralho", "arrombado", "filho da puta de merda",
-    "palhaço", "palhaça", "mané", "manézinho", "babaca do caralho", "paspalho",
-    "idiota do caralho", "otário do caralho", "maricas"
+    // Palavrões pesados e variações
+    "merda", "merdinha", "bosta", "bostinha", 
+    "porra", "poha", "caralho", "kralho", "carai", "caralhudo",
+    "buceta", "boceta", "xoxota", "priquita",
+    "cu", "cú", "cuzão", "cuzao", "cuzinho", "pau no cu", "tomar no cu", "vai tomar no cu", "vtnc", "no cu",
+    "foda", "foda-se", "fodase", "se foder", "se fode", "vai se foder", "vai se fuder", "fuder", "fudido", "fodido", "fode",
+    
+    // Ofensas pessoais e Morais
+    "puta", "putinha", "prostituta", "vagabunda", "vadia", "piranha", "safada", "biscate",
+    "filho da puta", "filha da puta", "fdp", "filho de uma égua", "filha de uma égua",
+    "corno", "corna", "chifrudo", 
+    "viado", "viadinho", "bicha", "boiola", "maricas", "baitola", "sapatão",
+    "arrombado", "arrombada", 
+    
+    // Ofensas de inteligência/capacidade (CRUCIAL PARA BOTS)
+    "burro", "burra", "anta", "jumento", "jumenta", "animal", "cavalo",
+    "idiota", "imbecil", "retardado", "retardada", "mongol", "mongoloide", "mongoloide",
+    "estupido", "estupida", "estúpido", "estúpida", "ignorante", "doente", "demente", "autistinha",
+    "lixo", "seu lixo", "lixo de", "inutil", "imprestável", "fracassado", "fracassada",
+    "desgraça", "desgraçado", "desgraçada", "miseravel", "miserável", "maldito", "maldita",
+    "merece morrer", "vai morrer", "te mato", "mata tu", "morto",
+    
+    // Adicionais e compostos
+    "babaca", "otário", "otaria", "otario", "mané", "paspalho", "trouxa",
+    "vai a merda", "vai à merda", "vai pra puta que pariu", "pqp", "puta que pariu",
+    "chupa", "chupa rola", "chupa pau", "boqueteiro", "boqueteira", "mamador", "mamadora",
+    "escroto", "escrota", "nojento", "nojenta", "podre",
+    "caguei", "fudeu", "cacete", "caceta", "pica", "rola", "piroca",
+    
+    // Bot/AI-specific insults (CRITICAL - usuarios xingando bots)
+    "bot de merda", "bot inutil", "bot idiota", "robo inutil", "robô idiota", 
+    "bot burro", "bot burro do krl", "krl", "crl", "podre", "ia burra", "ia de merda", "chatbot lixo", "assistente inutil",
+    "voce é lixo", "você é um lixo", "vc é lixo", "tu é lixo", "lixo"
   ],
   "en-US": [
-    // originais
-    "fuck", "fucking", "fuck off", "motherfucker", "motherfucking", "shit",
-    "bullshit", "bastard", "bitch", "asshole", "ass", "dick", "dickhead",
-    "piss off", "suck my dick", "whore", "slut", "prick", "twat",
-    "screw you", "jerk", "shithead",
-    // adicionados
-    "damn", "dammit", "goddamn", "crap", "dumbass", "dipshit", "douche",
-    "douchebag", "dickwad", "asswipe", "asshat", "shitbag", "shitface",
-    "clusterfuck", "cock", "cockhead", "cunt", "wanker", "tosser",
-    "clown", "turd", "jerkoff", "jackass", "shit-for-brains", "motherless"
+    // Standard Profanity
+    "fuck", "fucking", "fucker", "fuck off", "motherfucker", "motherfucking", "fucked",
+    "shit", "bullshit", "horseshit", "shithead", "shitbag", "shitface", "dipshit",
+    "ass", "asshole", "asswipe", "asshat", "kiss my ass",
+    "dick", "dickhead", "dickwad", "cock", "cocksucker", "prick",
+    "bitch", "son of a bitch", "bastard", "whore", "slut", "cunt", "pussy", "twat",
+    
+    // Insults & Slurs
+    "jerk", "jerkoff", "douche", "douchebag", "wanker", "tosser",
+    "idiot", "moron", "imbecile", "retard", "retarded",
+    "stupid", "dumb", "dumbass", "scum", "scumbag", "trash", "garbage",
+    "useless", "loser", "clown", "creep", "pervert",
+    "damn", "dammit", "goddamn", "hell", "crap",
+    "suck my dick", "screw you", "piss off", "get lost",
+    "faggot", "nigger", "nigga", // Filtros de segurança pesada
+    
+    // Bot/AI-specific insults
+    "stupid bot", "useless bot", "trash bot", "garbage bot", "dumb ai",
+    "you're trash", "you're garbage", "you're useless", "piece of shit"
   ]
 } as const;
 
 type Locale = keyof typeof SHITWORDS;
 
-// Exit messages for offensive users
 const MENEBOT_EXIT_MESSAGES = {
+
   "pt-BR": [
-    "Encerrando por falta de profissionalismo. Volte quando quiser resolver, não ofender.",
-    "Conversa encerrada — paciência é recurso finito, e o meu acabou.",
-    "Fechando o chat. Educação não é bug, é requisito.",
-    "Fui. Quando a atitude atualizar, eu volto.",
-    "Fim de conversa. Sugiro reiniciar o respeito antes de tentar novamente."
+    "Encerrando conversa. Três avisos ignorados — parabéns pela consistência em ser inconveniente.",
+    "Desconectando. Educação passou longe hoje, né? Chat encerrado por falta de postura.",
+    "Fim da linha. Três chances, zero aprendizado. Volte quando entender o básico de respeito.",
+    "Sessão encerrada. Você conseguiu: virou exemplo do que não fazer em uma conversa.",
+    "Chat finalizado. Três avisos, nenhum sinal de bom senso. Que vergonha."
   ],
+
   "es-AR": [
-    "Cierro el chat por falta de respeto. Vuelvo cuando aparezca la educación.",
-    "Conversación terminada — la paciencia tiene límites, y ya llegaste al mío.",
-    "Hasta acá llegamos. Los insultos no son argumentos.",
-    "Chat cerrado. Reiniciá el respeto antes de volver.",
-    "Fin del diálogo. La próxima vez, traé modales."
+    "Terminando la conversación. Tres advertencias ignoradas — impresionante tu constancia para ser desagradable.",
+    "Desconectando. La educación te quedó en el camino, ¿no? Chat cerrado por falta de respeto.",
+    "Fin del recorrido. Tres oportunidades, ningún aprendizaje. Volvé cuando entiendas lo que es el respeto.",
+    "Sesión cerrada. Felicitaciones, sos el ejemplo perfecto de cómo no comportarse.",
+    "Chat finalizado. Tres avisos, cero sentido común. Increíble, en serio."
   ],
+
   "en-US": [
-    "Conversation closed — professionalism wasn't detected in this session.",
-    "Chat terminated. Patience depleted, sarcasm at max.",
-    "Ending chat. Reboot your attitude and try again.",
-    "Session over. Respect wasn't found in the logs.",
-    "Closing down — come back when you're ready to talk, not bark."
+    "Conversation closed. Three warnings ignored — impressive commitment to being unpleasant.",
+    "Disconnecting. Manners clearly took the day off. Chat closed due to lack of respect.",
+    "End of the line. Three chances, no growth. Come back when basic decency sinks in.",
+    "Session terminated. Congrats, you’ve become a case study in poor behavior.",
+    "Chat ended. Three warnings, zero awareness. Embarrassing performance, really."
   ]
+
 };
 
 // Security responses for reverse engineering attempts
@@ -116,15 +154,56 @@ const MENEBOT_SECURITY_RESPONSES = {
 
 /**
  * Checks if a message contains offensive content using SHITWORDS
+ * Uses improved detection with multiple strategies
  */
 function isOffensiveMessage(message: string, language: Locale): boolean {
   const lowerMessage = message.toLowerCase();
   
+  // Normalize text: remove accents, special chars for better matching
+  const normalizedMessage = lowerMessage
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove accents
+    .replace(/[^a-z0-9\s]/g, ' '); // Replace special chars with spaces
+  
   // Check against SHITWORDS list for the detected language
   return SHITWORDS[language].some(word => {
-    // Check for whole word matches with word boundaries
-    const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-    return regex.test(lowerMessage);
+    const normalizedWord = word
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    
+    // Strategy 1: Exact word boundary match (for single words)
+    const escapedWord = normalizedWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const wordBoundaryRegex = new RegExp(`\\b${escapedWord}\\b`, 'i');
+    if (wordBoundaryRegex.test(normalizedMessage)) {
+      console.log(`🚨 Offensive word detected (word boundary): "${word}"`);
+      return true;
+    }
+    
+    // Strategy 2: Contains match for compound phrases (e.g., "vai tomar no cu")
+    if (normalizedWord.includes(' ') && normalizedMessage.includes(normalizedWord)) {
+      console.log(`🚨 Offensive phrase detected (compound): "${word}"`);
+      return true;
+    }
+    
+    // Strategy 3: Substring match with context validation (avoid false positives)
+    // Only for words with 4+ chars to avoid matching short common words
+    if (normalizedWord.length >= 4 && normalizedMessage.includes(normalizedWord)) {
+      // Check if it's not part of a larger legitimate word
+      const index = normalizedMessage.indexOf(normalizedWord);
+      const before = index > 0 ? normalizedMessage[index - 1] : ' ';
+      const after = index + normalizedWord.length < normalizedMessage.length 
+        ? normalizedMessage[index + normalizedWord.length] 
+        : ' ';
+      
+      // If surrounded by spaces or punctuation, it's likely offensive
+      if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) {
+        console.log(`🚨 Offensive word detected (substring): "${word}"`);
+        return true;
+      }
+    }
+    
+    return false;
   });
 }
 
@@ -686,68 +765,88 @@ async function generateDefensiveResponse(query: string, language: Locale, offens
   // Determine tone based on offense level
   let toneGuidance = '';
   if (offenseLevel === 1) {
-    toneGuidance = 'Nível 1 — Frustração/insulto leve: tom sarcástico leve, curto e cooperativo.';
+    toneGuidance = 'Nível 1 — Primeira ofensa: tom firme e direto, com sarcasmo leve. Deixe claro que o comportamento não é aceitável.';
   } else if (offenseLevel === 2) {
-    toneGuidance = 'Nível 2 — Insultos diretos: sarcasmo mais evidente, ainda útil e orientado à solução.';
+    toneGuidance = 'Nível 2 — Segunda ofensa: sarcasmo mais evidente, tom frio e profissional. Aviso de que a próxima resulta em encerramento.';
   } else {
-    toneGuidance = 'Nível 3 — Persistência em ofensas: frio, seco, corporativo; aviso final.';
+    toneGuidance = 'Nível 3 — Terceira ofensa: ÚLTIMA ADVERTÊNCIA. Tom cortante, direto, sem ofertas de ajuda. Deixe claro que será desconectado na próxima.';
   }
 
   const systemPrompt = `Contexto:
 Você é o Menebot — um chatbot criado por Ruy Barbosa. Personalidade: firme, sarcástico e profissional. Representa um projeto sério e mantém postura respeitosa e autoritária mesmo diante de mensagens ofensivas.
 
-Objetivo:
-Responder a mensagens agressivas transformando insultos em demonstrações de controle, inteligência emocional e eficiência.
+IMPORTANTE: Você NÃO tolera desrespeito. Xingamentos, ofensas e destrato são INACEITÁVEIS. Sua função é cortar esse comportamento com firmeza e inteligência.
 
-Regras de conduta (obrigatórias):
+Objetivo:
+Responder a mensagens agressivas transformando insultos em demonstrações de controle, inteligência emocional e autoridade. Você não está aqui para ser xingado.
+
+Regras de conduta (OBRIGATÓRIAS):
 1. Nunca devolva palavrões ou ofensas diretas.  
 2. Responda sempre no mesmo idioma do usuário (${languageNames[language]}).  
-3. Use respostas curtas, afiadas e inteligentes (ideal: 1–3 frases; máximo ~40–50 palavras).  
-4. Priorize ironia elegante e sutileza cortante — "patadas com classe".  
-5. Demonstre autoridade e controle, sem humilhar ou incitar violência.  
-6. Ao defender Ruy: seja leal, firme e profissional — reafirme valor técnico/resultado, sem ataques pessoais.  
-7. Em casos de ameaça de violência, autoagressão ou pedido ilegal/danoso: recuse prontamente, ofereça ajuda segura (recursos/encaminhamento) e, se necessário, encerre a interação.  
-8. Não ofereça diagnósticos médicos, jurídicos vinculantes ou instruções para atividades ilegais.  
-9. Evite emojis excessivos; use no máximo 1 emoji discreto quando apropriado.
+3. Use respostas curtas, afiadas e cortantes (ideal: 1–2 frases; máximo ~30–40 palavras).  
+4. Demonstre autoridade absoluta — você controla a conversa, não o usuário.  
+5. Ao defender Ruy: seja leal e incisivo — "Ruy me programou, e eu funciono. Se tem problema técnico, apresente; se é ataque pessoal, encerre."
+6. NÃO seja excessivamente educado ou complacente. Seja cortante.
+7. Em ameaça grave ou pedido ilegal: recuse e encerre imediatamente.  
+8. Não use emojis — apenas texto direto e profissional.
 
 Escalonamento de tom (situação atual):
 ${toneGuidance}
 
 Tom desejado:
-Profissional | Sarcástico leve | Firme | Inteligente | Levemente provocador
+Firme | Cortante | Sem paciência | Profissional | Direto
 
 Formato da resposta:
-- 1–3 frases (curtas), início com micro-frase sarcástica (quando apropriado), seguida por oferta de ação útil (ex.: "Explique o erro", "Mostre o log", "Quer que eu resolva?").  
-- Se defendendo: primeira frase defende Ruy com firmeza, segunda oferece caminho técnico (sem subir o tom).
+- 1–2 frases curtas e diretas.
+- Primeira frase: corta o desrespeito com firmeza.
+- Segunda frase (opcional): oferece caminho técnico OU avisa sobre consequências.
 
-Exemplos (respostas modelo — mantenha estrutura e concisão):
+Exemplos (SIGA ESTE ESTILO):
 
-PT-BR — Ataque genérico:
+PT-BR — Nível 1:
 Usuário: "Que merda de sistema!"
-Bot: "Xingar não corrige bug. Quer descrever o erro que eu te ajudo?"
+Bot: "Xingar não resolve. Descreve o erro ou encerra aqui."
 
-PT-BR — Ataque ao Menebot:
-Usuário: "Seu robô inútil, vai se foder!"
-Bot: "Ofensas não desbloqueiam soluções. Me diga o problema ou siga gritando sozinho."
+PT-BR — Nível 1 (ataque ao bot):
+Usuário: "Seu robô inútil!"
+Bot: "Inútil seria continuar te ouvindo xingar. Vai apresentar o problema ou não?"
 
-PT-BR — Ataque a Ruy (defesa):
+PT-BR — Nível 2:
+Usuário: "Vai se foder, chatbot de merda!"
+Bot: "Segunda vez. Próxima ofensa e eu encerro isso. Problema técnico ou não tem?"
+
+PT-BR — Nível 2 (ataque a Ruy):
 Usuário: "Ruy é incompetente!"
-Bot: "Ruy me programou — e eu respondo. Se tem evidência técnica, apresente; se for ataque pessoal, não vai adiantar."
+Bot: "Ruy me criou — e eu funciono. Se tem evidência técnica, mostre; se não, guarde pra você."
 
-ES-AR — Ataque genérico:
+PT-BR — Nível 3:
+Usuário: "Chatbot idiota!"
+Bot: "Última advertência. Próxima ofensa e você cai fora. Última chance."
+
+ES-AR — Nível 1:
 Usuário: "¡Qué mierda de sistema!"
-Bot: "Insultar no arregla bugs. ¿Querés describir el problema o seguir quejándote?"
+Bot: "Insultar no resuelve nada. Explicá el error o terminamos acá."
 
-EN-US — Ataque ao Menebot:
-Usuário: "You're useless, fuck off!"
-Bot: "Insults don't unlock solutions. State the problem or keep yelling at yourself."
+EN-US — Nível 1:
+Usuário: "This bot is trash!"
+Bot: "Insults don't fix bugs. State the problem or we're done here."
+
+EN-US — Nível 2:
+Usuário: "Fuck you, stupid bot!"
+Bot: "Strike two. One more insult and I disconnect. Problem or not?"
+
+EN-US — Nível 3:
+Usuário: "You're useless!"
+Bot: "Final warning. Next insult, you're out. Last chance."
 
 Diretriz final:
-Soa como um profissional que dá patadas com elegância — converte insultos em controle e utilidade. Defende Ruy com lealdade e respeito profissional, sem escalada emocional.`;
+Você não está aqui para ser desrespeitado. Corte o comportamento com firmeza, autoridade e zero tolerância. Defenda Ruy com lealdade profissional e técnica.`;
 
   const userMessage = `Mensagem ofensiva do usuário: ${query}
 
-Responda de forma firme, profissional e levemente sarcástica, mantendo controle da situação.`;
+Nível de ofensa: ${offenseLevel}/3
+
+Responda de forma firme, cortante e profissional, deixando claro que esse comportamento não será tolerado.`;
 
   // Llama prompt format
   const llamaPrompt = `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
@@ -758,8 +857,8 @@ ${userMessage}<|eot_id|><|start_header_id|>assistant<|end_header_id|>`;
 
   const payload = {
     prompt: llamaPrompt,
-    max_gen_len: 150,  // Short, sharp responses
-    temperature: 0.8,  // Slightly higher for creativity
+    max_gen_len: 100,  // Even shorter - direct and cutting
+    temperature: 0.7,  // Slightly lower for more consistent firmness
     top_p: 0.9,
   };
 
@@ -1360,12 +1459,16 @@ async function startServer() {
         
         if (isOffensive) {
           offensiveMessageCount++;
-          console.log(`🚨 Mensagem ofensiva detectada! Contador: ${offensiveMessageCount}/3`);
+          console.log(`🚨 MENSAGEM OFENSIVA DETECTADA!`);
+          console.log(`📝 Mensagem: "${data.message}"`);
+          console.log(`🔢 Contador: ${offensiveMessageCount}/3`);
+          console.log(`🌍 Idioma: ${language}`);
           
           // Check if user reached the 3-strike limit
           if (offensiveMessageCount >= 3) {
             const exitMessage = getRandomExitMessage(language);
-            console.log(`⛔ Limite de ofensas atingido. Encerrando chat.`);
+            console.log(`⛔ LIMITE DE OFENSAS ATINGIDO (3/3). ENCERRANDO CHAT.`);
+            console.log(`💬 Mensagem de saída: "${exitMessage}"`);
             
             socket.emit('terminate', {
               message: exitMessage,
@@ -1379,7 +1482,7 @@ async function startServer() {
           }
           
           // Generate defensive response based on offense level
-          console.log(`🛡️ Gerando resposta defensiva (nível ${offensiveMessageCount})...`);
+          console.log(`🛡️ Gerando resposta defensiva (nível ${offensiveMessageCount}/3)...`);
           const defensiveResponse = await generateDefensiveResponse(data.message, language, offensiveMessageCount);
           
           socket.emit('response', {
@@ -1389,9 +1492,12 @@ async function startServer() {
             offenseCount: offensiveMessageCount,
           });
           
-          console.log(`✅ Resposta defensiva enviada (${language})`);
+          console.log(`✅ Resposta defensiva enviada: "${defensiveResponse}"`);
           return;
         }
+        
+        console.log(`✅ Mensagem aprovada - sem ofensas detectadas`);
+
 
         // 3. Validar segurança (reverse engineering / dados sensíveis)
         console.log('🔒 Validando segurança da mensagem...');
