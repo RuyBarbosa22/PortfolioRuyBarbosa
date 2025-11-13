@@ -74,9 +74,9 @@ export default function Skills({ language }: SkillsProps) {
                     <img src={s.img} alt={meta.title ?? s.key} className="w-full h-full object-cover" />
                   </div>
                   <div className="flip-card-back absolute inset-0 rounded-2xl bg-[#08050b] p-6 flex flex-col items-center justify-center border border-[var(--color-primary)]/25">
-                    <h3 className="text-[var(--color-primary)] font-extrabold text-2xl mb-3 text-center" style={{ fontFamily: 'var(--font-montserrat)' }}>{meta.title ?? ''}</h3>
-                    <div className="w-full overflow-auto no-scrollbar-vertical" style={{ maxHeight: 'calc(100% - 4.5rem)' }}>
-                      <p className="text-gray-300 text-sm md:text-base xl:text-sm max-w-full" style={{ textAlign: 'justify', fontFamily: 'var(--font-montserrat)', lineHeight: 1.7 }}>
+                    <h3 className="text-[var(--color-primary)] font-extrabold text-2xl mb-4 text-center" style={{ fontFamily: 'var(--font-montserrat)' }}>{meta.title ?? ''}</h3>
+                    <div className="w-full overflow-auto no-scrollbar-vertical" style={{ maxHeight: 'calc(100% - 5rem)' }}>
+                      <p className="text-white text-base md:text-lg max-w-full" style={{ textAlign: 'justify', fontFamily: 'var(--font-montserrat)', lineHeight: 1.7, fontSize: '1rem' }}>
                         {meta.text ?? ''}
                       </p>
                     </div>
