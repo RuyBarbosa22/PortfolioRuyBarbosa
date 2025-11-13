@@ -76,7 +76,7 @@ export default function Skills({ language }: SkillsProps) {
                   <div className="flip-card-back absolute inset-0 rounded-2xl bg-[#08050b] p-6 flex flex-col items-center justify-center border border-[var(--color-primary)]/25">
                     <h3 className="text-[var(--color-primary)] font-extrabold text-2xl mb-4 text-center" style={{ fontFamily: 'var(--font-montserrat)' }}>{meta.title ?? ''}</h3>
                     <div className="w-full overflow-auto no-scrollbar-vertical" style={{ maxHeight: 'calc(100% - 5rem)' }}>
-                      <p className="text-white text-base md:text-lg max-w-full" style={{ textAlign: 'justify', fontFamily: 'var(--font-montserrat)', lineHeight: 1.7, fontSize: '1rem' }}>
+                      <p className="text-white text-base md:text-lg max-w-full" style={{ fontFamily: 'var(--font-roboto-mono)', color: '#fafafa', lineHeight: 1.7, textAlign: 'justify' }}>
                         {meta.text ?? ''}
                       </p>
                     </div>

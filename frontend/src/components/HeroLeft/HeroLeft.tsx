@@ -102,7 +102,7 @@ export const HeroLeft: React.FC<HeroLeftProps> = ({
         </h2>
       </div>
 
-      <p className="text-sm sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal mb-10 md:mb-12 xl:mb-14  xl:max-w-xl leading-relaxed lg:mx-0 text-justify lg:px-0">
+      <p className="text-md sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal mb-10 md:mb-12 xl:mb-14  xl:max-w-xl leading-relaxed lg:mx-0 text-justify lg:px-0">
         {language === "pt" && (
           <>
             Explore minhas paixões tecnológicas e projetos. Clique à vontade e

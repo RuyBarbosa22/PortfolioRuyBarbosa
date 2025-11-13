@@ -507,7 +507,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
           </div>
 
           {/* Descrição - padrão Hero/MyStory */}
-          <p className="text-sm sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] md:mx-auto text-justify lg:text-center">
+          <p className="text-md sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-12 max-w-[800px] md:mx-auto text-justify lg:text-center">
             {content.description}
           </p>
 

@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import menebotFrontImage from '/assets/images/menebotFront.png';
-import menebotBlinkImage from '/assets/images/menebotBlink.png';
-import wingLeftSvg from '/assets/icons/menebot-wing-left.svg';
-import wingRightSvg from '/assets/icons/menebot-wing-right.svg';
-import eyeSvg from '/assets/icons/menebot-eye.svg';
-import closedEyeSvg from '/assets/icons/menebot-closed-eye.svg';
+// Public assets should be used via their served URL. Importing files directly from `public/` causes Vite warnings.
+// Use the `?url` suffix so Vite treats them as static URLs.
+import menebotFrontImage from '/assets/images/menebotFront.png?url';
+import menebotBlinkImage from '/assets/images/menebotBlink.png?url';
+import wingLeftSvg from '/assets/icons/menebot-wing-left.svg?url';
+import wingRightSvg from '/assets/icons/menebot-wing-right.svg?url';
+import eyeSvg from '/assets/icons/menebot-eye.svg?url';
+import closedEyeSvg from '/assets/icons/menebot-closed-eye.svg?url';
 
 interface MenebotProps {
   className?: string;
@@ -21,6 +23,15 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   const containerRef = useRef<HTMLDivElement>(null);
   const blinkIntervalRef = useRef<number | null>(null);
 
+  // Preload das imagens críticas para garantir que o blink funcione
+  useEffect(() => {
+    const preloadImages = [menebotBlinkImage, closedEyeSvg];
+    preloadImages.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   // Função para executar o squeeze
   const triggerSqueeze = () => {
     setIsSqueezing(true);
@@ -30,7 +41,7 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   // Função para piscar + squeeze
   const triggerBlinkAndSqueeze = () => {
     setIsBlinking(true);
-    setTimeout(() => setIsBlinking(false), 150);
+    setTimeout(() => setIsBlinking(false), 150); // 150ms para piscar rápido
     triggerSqueeze();
   };
 

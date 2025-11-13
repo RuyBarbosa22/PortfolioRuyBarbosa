@@ -495,7 +495,7 @@ function App() {
                       {translations[currentLanguage].projects.title}
                     </h2>
                     <p
-                      className="text-lg md:text-xl text-justify text-gray-200 font-['Roboto_Mono',monospace] font-normal mb-2 w-[100%] md:w-[90%] tracking-wide"
+                      className="text-md md:text-xl text-justify text-gray-200 font-['Roboto_Mono',monospace] font-normal mb-2 w-[100%] md:w-[90%] tracking-wide"
                       style={{ letterSpacing: "0.02em" }}
                     >
                       {translations[currentLanguage].projects.subtitle}

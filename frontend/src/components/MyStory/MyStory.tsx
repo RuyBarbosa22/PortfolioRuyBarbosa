@@ -1,7 +1,10 @@
 import React from 'react';
-import ruy01 from '/assets/images/ruy01.jpeg';
-import ruy02 from '/assets/images/ruy02.jpeg';
-import ruy03 from '/assets/images/ruy03.jpeg';
+import foto01 from '/assets/images/foto_01.jpeg';
+import foto02 from '/assets/images/foto_02.jpeg';
+import foto03 from '/assets/images/foto_03.jpeg';
+import foto04 from '/assets/images/foto_04.jpeg';
+import foto05 from '/assets/images/foto_05.jpeg';
+import foto06 from '/assets/images/foto_06.jpeg';
 import { PolaroidCarousel } from '../PolaroidCarousel/PolaroidCarousel';
 import { AnimatedStat } from '../AnimatedStat/AnimatedStat';
 
@@ -10,8 +13,8 @@ interface MyStoryProps {
 }
 
 export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
-  // Array de imagens - adicione mais quando disponível
-  const images = [ruy01, ruy02, ruy03];
+  // Array de imagens - todas as 6 fotos disponíveis
+  const images = [foto01, foto02, foto03, foto04, foto05, foto06];
 
   const contentByLang: Record<string, { title: string; description: string; stats: Array<{ value: string; label: string }> }> = {
     pt: {
@@ -69,7 +72,7 @@ export const MyStory: React.FC<MyStoryProps> = ({ language = 'pt' }) => {
               <h2 className="text-3xl md:text-4xl font-extrabold text-center md:text-left mb-4 text-[var(--color-primary)] font-['Montserrat',sans-serif]">
                 {content.title}
               </h2>
-              <p className="text-sm sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-8 text-justify">
+              <p className="text-md sm:text-base md:text-xl text-gray-200 font-['Roboto_Mono',monospace] font-normal leading-relaxed mb-8 text-justify">
                 {content.description}
               </p>
             </div>
