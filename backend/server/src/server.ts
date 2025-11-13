@@ -1021,10 +1021,36 @@ async function startServer() {
   const app = express();
   const httpServer = createServer(app);
 
-  // Middleware CORS - Apenas localhost
+  // Middleware CORS - Aceita múltiplas origens (dev e prod)
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5173/',
+    'https://www.ruybarbosa.dev',
+    'https://www.ruybarbosa.dev/',
+    'https://ruybarbosa.dev',
+    'https://ruybarbosa.dev/',
+    process.env.FRONTEND_URL
+  ].filter(Boolean) as string[];
+
   app.use(cors({ 
-    origin: FRONTEND_URL,
-    credentials: true 
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, Postman, curl)
+      if (!origin) return callback(null, true);
+      
+      // Remove trailing slash for comparison
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ''));
+      
+      if (normalizedAllowed.includes(normalizedOrigin)) {
+        callback(null, true);
+      } else {
+        console.warn(`🚫 CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   }));
   app.use(express.json());
 
@@ -1404,10 +1430,24 @@ async function startServer() {
     }
   });
 
-  // Socket.io - Apenas localhost
+  // Socket.io - Aceita múltiplas origens (dev e prod)
   const io = new Server(httpServer, {
     cors: {
-      origin: FRONTEND_URL,
+      origin: (origin, callback) => {
+        // Allow requests with no origin
+        if (!origin) return callback(null, true);
+        
+        // Remove trailing slash for comparison
+        const normalizedOrigin = origin.replace(/\/$/, '');
+        const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ''));
+        
+        if (normalizedAllowed.includes(normalizedOrigin)) {
+          callback(null, true);
+        } else {
+          console.warn(`🚫 Socket.IO CORS blocked origin: ${origin}`);
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST'],
     },
