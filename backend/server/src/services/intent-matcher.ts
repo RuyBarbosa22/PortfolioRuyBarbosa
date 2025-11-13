@@ -18,7 +18,6 @@ export type Language = 'pt' | 'en' | 'es';
 export function detectLanguage(message: string): Language {
   const lowerMsg = message.toLowerCase();
   
-  // Palavras características de cada idioma
   const ptIndicators = ['você', 'está', 'pode', 'quais', 'qual', 'onde', 'como', 'seu', 'sua'];
   const enIndicators = ['you', 'your', 'what', 'where', 'how', 'can', 'are', 'is', 'do'];
   const esIndicators = ['usted', 'está', 'puede', 'cuáles', 'cuál', 'dónde', 'cómo', 'tu', 'su'];
@@ -39,7 +38,6 @@ export function detectLanguage(message: string): Language {
     if (lowerMsg.includes(word)) esScore++;
   });
   
-  // Retorna idioma com maior pontuação
   if (ptScore >= enScore && ptScore >= esScore) return 'pt';
   if (enScore > ptScore && enScore >= esScore) return 'en';
   return 'es';
@@ -53,13 +51,11 @@ export function matchIntent(message: string): FAQ | null {
   const lowerMsg = message.toLowerCase();
   const typedFaqs = faqs as FAQ[];
   
-  // Normalizar texto removendo acentos para melhor matching
   const normalizedMsg = lowerMsg
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
   
   for (const faq of typedFaqs) {
-    // Contar quantas keywords aparecem na mensagem
     const matchedKeywords = faq.keywords.filter(keyword => {
       const normalizedKeyword = keyword
         .toLowerCase()
@@ -69,7 +65,6 @@ export function matchIntent(message: string): FAQ | null {
       return normalizedMsg.includes(normalizedKeyword);
     });
     
-    // Se pelo menos 1 keyword foi encontrada, considera match
     if (matchedKeywords.length > 0) {
       console.log(`✅ Intent matched: ${faq.intent} (keywords: ${matchedKeywords.join(', ')})`);
       return faq;

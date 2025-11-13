@@ -40,9 +40,6 @@ const EMBEDDING_MODEL = process.env.BEDROCK_EMBEDDING_MODEL || 'amazon.titan-emb
 const s3Client = new S3Client({ region: AWS_REGION });
 const bedrockClient = new BedrockRuntimeClient({ region: AWS_REGION });
 
-/**
- * Baixa o PDF do S3
- */
 async function downloadPdfFromS3(): Promise<Buffer> {
   console.log(`📥 Baixando PDF do S3: s3://${S3_BUCKET}/${PDF_S3_KEY}`);
   
@@ -62,9 +59,6 @@ async function downloadPdfFromS3(): Promise<Buffer> {
   return Buffer.concat(chunks);
 }
 
-/**
- * Extrai texto do PDF
- */
 async function extractTextFromPdf(pdfBuffer: Buffer): Promise<string> {
   console.log('📄 Extraindo texto do PDF...');
   const data = await pdf(pdfBuffer);
@@ -72,13 +66,9 @@ async function extractTextFromPdf(pdfBuffer: Buffer): Promise<string> {
   return data.text;
 }
 
-/**
- * Divide texto em chunks com overlap
- */
 export function chunkText(text: string, chunkSize: number = CHUNK_SIZE, overlap: number = CHUNK_OVERLAP): string[] {
   console.log(`✂️  Dividindo texto em chunks (tamanho: ${chunkSize}, overlap: ${overlap})...`);
   
-  // Normaliza espaços e quebras de linha
   const normalizedText = text.replace(/\s+/g, ' ').trim();
   
   const chunks: string[] = [];
@@ -88,13 +78,12 @@ export function chunkText(text: string, chunkSize: number = CHUNK_SIZE, overlap:
     const end = Math.min(start + chunkSize, normalizedText.length);
     const chunk = normalizedText.slice(start, end).trim();
     
-    if (chunk.length > 50) { // Ignora chunks muito pequenos
+    if (chunk.length > 50) {
       chunks.push(chunk);
     }
     
     start += chunkSize - overlap;
     
-    // Evita loops infinitos
     if (start <= chunks.length * (chunkSize - overlap) - overlap) {
       start = chunks.length * (chunkSize - overlap);
     }
@@ -143,7 +132,6 @@ async function generateEmbeddings(chunks: string[]): Promise<Chunk[]> {
       index: i,
     });
     
-    // Rate limiting: aguarda 100ms entre requests
     if (i < chunks.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
@@ -174,7 +162,6 @@ async function saveEmbeddingsToS3(embeddedChunks: Chunk[]): Promise<string> {
 
   console.log(`💾 Salvando embeddings no S3: s3://${S3_BUCKET}/embeddings/${version}`);
   
-  // Salva arquivo de embeddings
   await s3Client.send(new PutObjectCommand({
     Bucket: S3_BUCKET,
     Key: `embeddings/${version}`,
@@ -195,7 +182,6 @@ async function updateMetadata(version: string): Promise<void> {
   let metadata: Metadata;
   
   try {
-    // Tenta carregar metadata existente
     const command = new GetObjectCommand({
       Bucket: S3_BUCKET,
       Key: 'embeddings/metadata.json',
@@ -212,7 +198,6 @@ async function updateMetadata(version: string): Promise<void> {
     // Adiciona nova versão
     metadata.versions.push(version);
   } catch (error) {
-    // Se não existir, cria novo
     metadata = {
       current_version: version,
       versions: [version],
@@ -223,7 +208,6 @@ async function updateMetadata(version: string): Promise<void> {
   metadata.current_version = version;
   metadata.last_update = Date.now();
 
-  // Salva metadata atualizado
   await s3Client.send(new PutObjectCommand({
     Bucket: S3_BUCKET,
     Key: 'embeddings/metadata.json',
@@ -234,29 +218,15 @@ async function updateMetadata(version: string): Promise<void> {
   console.log('✅ Metadata atualizado com sucesso');
 }
 
-/**
- * Função principal de ingestão
- */
 async function ingestPdf() {
   console.log('🚀 Iniciando ingestão do PDF...\n');
 
   try {
-    // 1. Download PDF
     const pdfBuffer = await downloadPdfFromS3();
-
-    // 2. Extrai texto
     const text = await extractTextFromPdf(pdfBuffer);
-
-    // 3. Chunking
     const chunks = chunkText(text);
-
-    // 4. Gera embeddings
     const embeddedChunks = await generateEmbeddings(chunks);
-
-    // 5. Salva no S3
     const version = await saveEmbeddingsToS3(embeddedChunks);
-
-    // 6. Atualiza metadata
     await updateMetadata(version);
 
     console.log('\n✨ Ingestão concluída com sucesso!');
@@ -269,6 +239,5 @@ async function ingestPdf() {
   }
 }
 
-// Executa sempre
 console.log('🚀 Iniciando processo de ingestão...\n');
 ingestPdf();

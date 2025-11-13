@@ -20,10 +20,8 @@ export const MenebotChatProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [isChatOpen, setChatOpen] = useState(false);
   const [pendingSection, setPendingSection] = useState<string | null>(null);
 
-  // Usado pelo Navbar para pedir fechamento do chat e navegação
   const requestClose = useCallback((sectionId?: string) => {
     setPendingSection(sectionId || null);
-    // Não fecha o chat imediatamente, só sinaliza intenção
   }, []);
 
   const clearPendingSection = useCallback(() => setPendingSection(null), []);

@@ -279,11 +279,9 @@ ${securityPrompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>`;
     const responseBody = JSON.parse(new TextDecoder().decode(response.body));
     const result = responseBody.generation.trim().toUpperCase();
 
-    // Retorna true se for RISCO, false se for SEGURO
     return result.includes('RISCO');
   } catch (error) {
     console.error('Erro ao validar segurança da mensagem:', error);
-    // Em caso de erro, assume como seguro para não bloquear usuários legítimos
     return false;
   }
 }
@@ -1015,7 +1013,6 @@ function checkRateLimit(ip: string): boolean {
  * Inicializa servidor
  */
 async function startServer() {
-  // Carrega embeddings na inicialização
   await loadEmbeddings();
 
   const app = express();
@@ -1034,10 +1031,8 @@ async function startServer() {
 
   app.use(cors({ 
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, Postman, curl)
       if (!origin) return callback(null, true);
       
-      // Remove trailing slash for comparison
       const normalizedOrigin = origin.replace(/\/$/, '');
       const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ''));
       
@@ -1434,10 +1429,8 @@ async function startServer() {
   const io = new Server(httpServer, {
     cors: {
       origin: (origin, callback) => {
-        // Allow requests with no origin
         if (!origin) return callback(null, true);
         
-        // Remove trailing slash for comparison
         const normalizedOrigin = origin.replace(/\/$/, '');
         const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ''));
         

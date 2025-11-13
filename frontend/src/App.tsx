@@ -174,13 +174,10 @@ function App() {
 
   // Shared handlers for confirm buttons (Yes / No)
   const handleConfirmYes = () => {
-    // trigger exit animation and scroll to chat section
     setMenebotExiting(true);
-    const menebotSection = document.getElementById("chat-with-menebot-section");
-    if (menebotSection) {
-      menebotSection.scrollIntoView({ behavior: "smooth" });
-    }
-    // after short delay, stop exit animation and reset
+    const section = document.getElementById('chat-with-menebot-section');
+    section?.scrollIntoView({ behavior: 'smooth' });
+
     setTimeout(() => {
       setMenebotExiting(false);
       setIsTalkBoxVisible(false);
@@ -189,14 +186,11 @@ function App() {
   };
 
   const handleConfirmNo = () => {
-    // If the confirm was shown on the last message, close and reset.
-    // Otherwise (e.g. the 3rd message), continue the flow to the next message.
-    const lastIdx = Math.max(0, menebotMessages.length - 1);
-    if (currentMessageIndex === lastIdx) {
+    if (currentMessageIndex === menebotMessages.length - 1) {
       setIsTalkBoxVisible(false);
       setCurrentMessageIndex(0);
     } else {
-      setCurrentMessageIndex((i) => Math.min(i + 1, lastIdx));
+      setCurrentMessageIndex(currentMessageIndex + 1);
     }
   };
 

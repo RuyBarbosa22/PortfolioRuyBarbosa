@@ -19,7 +19,6 @@ async function checkBedrockAccess() {
     
     console.log(`✅ Conectado ao Bedrock! ${response.modelSummaries?.length || 0} modelos listados.\n`);
     
-    // Verificar modelos específicos que precisamos
     const titanEmbed = response.modelSummaries?.find(m => 
       m.modelId === 'amazon.titan-embed-text-v1'
     );

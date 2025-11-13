@@ -20,7 +20,6 @@ async function testIngest() {
     const bucket = process.env.S3_BUCKET_NAME || 'menebot-embeddings-bucket';
     const key = process.env.PDF_S3_KEY || 'content/RuyBarbosa_Consolidated_Profile_Final_Draft.pdf';
     
-    // Passo 1: Baixar PDF
     console.log('1️⃣  Baixando PDF do S3...');
     console.log(`   Bucket: ${bucket}`);
     console.log(`   Key: ${key}`);
@@ -30,7 +29,6 @@ async function testIngest() {
     
     console.log('   ✅ PDF baixado! Convertendo stream...');
     
-    // Converter stream para buffer
     const chunks: any[] = [];
     const stream = response.Body as Readable;
     
@@ -41,7 +39,6 @@ async function testIngest() {
     const buffer = Buffer.concat(chunks);
     console.log(`   ✅ Buffer criado: ${Math.round(buffer.length / 1024)} KB\n`);
     
-    // Passo 2: Extrair texto
     console.log('2️⃣  Extraindo texto do PDF...');
     const data = await pdf(buffer);
     
@@ -49,7 +46,6 @@ async function testIngest() {
     console.log(`   📄 Páginas: ${data.numpages}`);
     console.log(`   📝 Preview: ${data.text.substring(0, 200)}...\n`);
     
-    // Passo 3: Dividir em chunks
     console.log('3️⃣  Dividindo em chunks...');
     const CHUNK_SIZE = 800;
     const CHUNK_OVERLAP = 200;

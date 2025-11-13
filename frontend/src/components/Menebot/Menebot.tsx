@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-// Public assets should be used via their served URL. Importing files directly from `public/` causes Vite warnings.
-// Use the `?url` suffix so Vite treats them as static URLs.
 import menebotFrontImage from '/assets/images/menebotFront.png?url';
 import menebotBlinkImage from '/assets/images/menebotBlink.png?url';
 import wingLeftSvg from '/assets/icons/menebot-wing-left.svg?url';
@@ -23,7 +21,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   const containerRef = useRef<HTMLDivElement>(null);
   const blinkIntervalRef = useRef<number | null>(null);
 
-  // Preload das imagens críticas para garantir que o blink funcione
   useEffect(() => {
     const preloadImages = [menebotBlinkImage, closedEyeSvg];
     preloadImages.forEach(src => {
@@ -32,20 +29,17 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
     });
   }, []);
 
-  // Função para executar o squeeze
   const triggerSqueeze = () => {
     setIsSqueezing(true);
     setTimeout(() => setIsSqueezing(false), 300);
   };
 
-  // Função para piscar + squeeze
   const triggerBlinkAndSqueeze = () => {
     setIsBlinking(true);
-    setTimeout(() => setIsBlinking(false), 150); // 150ms para piscar rápido
+    setTimeout(() => setIsBlinking(false), 150);
     triggerSqueeze();
   };
 
-  // Inactivity timer: sono após 35s sem interação do usuário
   const sleepTimeoutRef = useRef<number | null>(null);
 
   const scheduleInactivity = () => {
@@ -53,10 +47,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
       clearTimeout(sleepTimeoutRef.current);
     }
     
-    // Resetar sono
     setIsSleeping(false);
     
-    // Iniciar/reiniciar intervalo de piscar a cada 10s
     if (blinkIntervalRef.current) {
       clearInterval(blinkIntervalRef.current);
     }
@@ -64,22 +56,19 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
       triggerBlinkAndSqueeze();
     }, 6000);
     
-    // Timer de sono após 35s
     sleepTimeoutRef.current = window.setTimeout(() => {
       setIsSleeping(true);
-      // Parar animações automáticas quando dormir
       if (blinkIntervalRef.current) {
         clearInterval(blinkIntervalRef.current);
         blinkIntervalRef.current = null;
       }
-    }, 35000); // 35 segundos
+    }, 35000);
   };
 
   const resetInactivity = () => {
     scheduleInactivity();
   };
 
-  // Notificar o componente pai quando o estado de sono mudar
   useEffect(() => {
     if (onSleepChange) {
       onSleepChange(isSleeping);
@@ -87,10 +76,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   }, [isSleeping, onSleepChange]);
 
   useEffect(() => {
-    // Start the inactivity timer
     scheduleInactivity();
 
-    // Any user interaction resets the inactivity timer
     const events = ['mousemove', 'mousedown', 'keydown', 'touchstart'];
     for (const ev of events) window.addEventListener(ev, resetInactivity);
 
@@ -101,11 +88,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
     };
   }, []);
 
-  // Nota: wing-flap e squeeze agora são acionados apenas ao clicar.
-  // Removemos os intervals automáticos para que o usuário controle
-  // quando as animações ocorrem.
-
-  // Rastrear movimento do mouse para os olhos seguirem
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -114,11 +96,9 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      // Calcular distância do mouse ao centro do Menebot
       const deltaX = e.clientX - centerX;
       const deltaY = e.clientY - centerY;
 
-      // Limitar movimento dos olhos (máximo 15px em cada direção)
       const maxDistance = 15;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       const limitedDistance = Math.min(distance, maxDistance * 5);
@@ -134,9 +114,7 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Handler para piscar ao clicar (acorda se estiver dormindo)
   const handleClick = () => {
-    // Se estiver dormindo, acorda e reinicia timers
     if (isSleeping) {
       setIsSleeping(false);
       triggerBlinkAndSqueeze();
@@ -144,10 +122,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
       return;
     }
     
-    // Estado normal: blink + squeeze
     triggerBlinkAndSqueeze();
 
-    // Wing flap
     setIsFlapping(true);
     setTimeout(() => setIsFlapping(false), 600);
   };
@@ -163,11 +139,9 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
         pointerEvents: isExiting ? 'none' : undefined,
       }}
     >
-      {/* Animação de Zs quando dormindo */}
       {isSleeping && (
         <div className="absolute -top-8 right-4 md:-top-12 md:right-6 lg:-top-16 lg:right-8 z-30 pointer-events-none">
           <div className="relative">
-            {/* Z grande */}
             <span 
               className="absolute text-white/80 font-bold text-3xl"
               style={{
@@ -178,7 +152,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
             >
               Z
             </span>
-            {/* Z médio */}
             <span 
               className="absolute text-white/60 font-bold text-2xl left-8"
               style={{
@@ -189,7 +162,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
             >
               z
             </span>
-            {/* Z pequeno */}
             <span 
               className="absolute text-white/40 font-bold text-xl left-12 top-2"
               style={{
@@ -204,7 +176,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
         </div>
       )}
       
-      {/* Container com animação de flutuação */}
       <div 
         className="relative cursor-pointer"
         style={{ 
@@ -212,7 +183,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
         }}
         onClick={handleClick}
       >
-        {/* Container interno para wingFlap e squeeze */}
         <div
           className="relative"
           style={{
@@ -221,8 +191,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
             transition: 'transform 0.3s ease-out'
           }}
         >
-          {/* Asinhas (renderizadas atrás do corpo) */}
-          {/* Asa Esquerda */}
           <img 
             src={wingLeftSvg}
             alt=""
@@ -239,7 +207,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
             draggable="false"
           />
           
-          {/* Asa Direita */}
           <img 
             src={wingRightSvg}
             alt=""
@@ -256,7 +223,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
             draggable="false"
           />
 
-          {/* Corpo do Menebot (z-index maior para ficar na frente) */}
           <img 
             src={isBlinking ? menebotBlinkImage : menebotFrontImage}
             alt="Menebot - Assistente virtual" 
@@ -265,10 +231,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
             draggable="false"
           />
 
-        {/* Olhos que seguem o mouse (apenas quando não está piscando) */}
         {!isBlinking && (
           <>
-            {/* Olho Esquerdo - Mobile Extra Pequeno (<425px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -284,7 +248,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Direito - Mobile Extra Pequeno (<425px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -300,7 +263,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Esquerdo - Mobile (425px-768px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -316,7 +278,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Direito - Mobile (425px-768px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -332,7 +293,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Esquerdo - Tablet (md) - Tamanho ajustado */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -348,7 +308,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Direito - Tablet (md) - Tamanho ajustado */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -364,7 +323,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Esquerdo - Desktop (1024px-1280px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -380,7 +338,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Direito - Desktop (1024px-1280px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -396,7 +353,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Esquerdo - Desktop XL (>=1280px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""
@@ -412,7 +368,6 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               draggable="false"
             />
             
-            {/* Olho Direito - Desktop XL (>=1280px) */}
             <img 
               src={isSleeping ? closedEyeSvg : eyeSvg}
               alt=""

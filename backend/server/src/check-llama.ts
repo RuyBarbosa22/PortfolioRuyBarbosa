@@ -17,12 +17,10 @@ async function checkLlamaAccess() {
   try {
     const response = await bedrock.send(new ListFoundationModelsCommand({}));
     
-    // Procurar Llama 3.1 70B
     const llama70b = response.modelSummaries?.find(m => 
       m.modelId === 'meta.llama3-1-70b-instruct-v1:0'
     );
     
-    // Procurar outros modelos Llama disponíveis
     const llamaModels = response.modelSummaries?.filter(m => 
       m.modelId?.includes('llama')
     ) || [];
@@ -62,7 +60,6 @@ async function checkLlamaAccess() {
       console.log('   Execute este script novamente depois!\n');
     }
     
-    // Mostrar outros modelos Llama disponíveis
     if (llamaModels.length > 0) {
       console.log('📦 Outros modelos Llama disponíveis:\n');
       llamaModels.forEach(model => {
