@@ -1,4 +1,5 @@
 import faqs from '../data/faqs.json' with { type: 'json' };
+import { detectLanguage, type Language } from '../utils/language-detector.js';
 
 export interface FAQ {
   id: string;
@@ -7,40 +8,6 @@ export interface FAQ {
   answer_pt: string;
   answer_en: string;
   answer_es: string;
-}
-
-export type Language = 'pt' | 'en' | 'es';
-
-/**
- * Detecta o idioma da mensagem do usuário
- * Retorna 'pt', 'en' ou 'es'
- */
-export function detectLanguage(message: string): Language {
-  const lowerMsg = message.toLowerCase();
-  
-  const ptIndicators = ['você', 'está', 'pode', 'quais', 'qual', 'onde', 'como', 'seu', 'sua'];
-  const enIndicators = ['you', 'your', 'what', 'where', 'how', 'can', 'are', 'is', 'do'];
-  const esIndicators = ['usted', 'está', 'puede', 'cuáles', 'cuál', 'dónde', 'cómo', 'tu', 'su'];
-  
-  let ptScore = 0;
-  let enScore = 0;
-  let esScore = 0;
-  
-  ptIndicators.forEach(word => {
-    if (lowerMsg.includes(word)) ptScore++;
-  });
-  
-  enIndicators.forEach(word => {
-    if (lowerMsg.includes(word)) enScore++;
-  });
-  
-  esIndicators.forEach(word => {
-    if (lowerMsg.includes(word)) esScore++;
-  });
-  
-  if (ptScore >= enScore && ptScore >= esScore) return 'pt';
-  if (enScore > ptScore && enScore >= esScore) return 'en';
-  return 'es';
 }
 
 /**
@@ -79,14 +46,13 @@ export function matchIntent(message: string): FAQ | null {
  * Retorna a resposta do FAQ no idioma apropriado
  */
 export function getAnswerForLanguage(faq: FAQ, language: Language): string {
-  const answerKey = `answer_${language}` as keyof FAQ;
+  // Mapeia 'pt-BR' -> 'pt', 'en-US' -> 'en', 'es-AR' -> 'es'
+  const langCode = language.split('-')[0] as 'pt' | 'en' | 'es';
+  const answerKey = `answer_${langCode}` as keyof FAQ;
   return faq[answerKey] as string;
 }
 
-/**
- * Função principal: tenta match de intent e retorna resposta ou null
- * Se retornar null, o sistema deve usar RAG normal
- */
+
 export function tryIntentMatch(message: string): string | null {
   const faq = matchIntent(message);
   

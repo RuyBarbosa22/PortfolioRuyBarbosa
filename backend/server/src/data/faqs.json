@@ -3,46 +3,46 @@
     "id": "summary",
     "intent": "who_is_ruy",
     "keywords": ["quem é", "perfil", "resumo", "sobre você", "who are you", "about yourself", "quién eres", "sobre ti"],
-    "answer_pt": "Sou Ruy Barbosa, desenvolvedor fullstack com foco em backend (Node.js) e experiência em AWS, SecOps e automação de scripts. Busco atuar como Backend Engineer ou Fullstack Developer em projetos em nuvem e automação.",
-    "answer_en": "I'm Ruy Barbosa, a fullstack developer focused on backend (Node.js) with experience in AWS, SecOps and scripting automation. I aim to work as a Backend Engineer or Fullstack Developer on cloud and automation projects.",
-    "answer_es": "Soy Ruy Barbosa, desarrollador fullstack con enfoque en backend (Node.js) y experiencia en AWS, SecOps y automatización con scripts. Mi objetivo es trabajar como Backend Engineer o Fullstack Developer en proyectos cloud y de automatización."
+    "answer_pt": "Sou Ruy Barbosa, desenvolvedor fullstack com foco em (Node.js) e experiência em AWS, SecOps e automação de scripts. Busco atuar como Fullstack Developer em projetos Web/Mobile.",
+    "answer_en": "I'm Ruy Barbosa, a fullstack developer focused on (Node.js) with experience in AWS, SecOps and scripting automation. I aim to work as a Fullstack Developer on Web/Mobile projects.",
+    "answer_es": "Soy Ruy Barbosa, desarrollador fullstack con enfoque en (Node.js) y experiencia en AWS, SecOps y automatización con scripts. Mi objetivo es trabajar como Fullstack Developer en proyectos Web/Mobile."
   },
   {
     "id": "main_focus",
     "intent": "what_is_focus",
     "keywords": ["foco", "especialidade", "área", "especialização", "main focus", "specialize", "foco profesional", "especializas"],
-    "answer_pt": "Meu foco é desenvolvimento backend com Node.js e soluções em AWS; trabalho também como fullstack quando necessário, com interesse em automação e escalabilidade.",
-    "answer_en": "My focus is backend development with Node.js and AWS solutions; I also work as fullstack when needed, with an interest in automation and scalability.",
-    "answer_es": "Mi foco es el desarrollo backend con Node.js y soluciones en AWS; también trabajo como fullstack cuando es necesario, con interés en automatización y escalabilidad."
+    "answer_pt": "Meu foco é desenvolvimento fullstack com Node.js e soluções em AWS; trabalho também com infraestrutura em cloud quando necessário, tenho interesse em aprender sobre automação e escalabilidade.",
+    "answer_en": "My focus is fullstack development with Node.js and AWS solutions; I also work with cloud infrastructure when needed, and I'm interested in learning about automation and scalability.",
+    "answer_es": "Mi foco es el desarrollo fullstack con Node.js y soluciones en AWS; también trabajo con infraestructura cloud cuando es necesario, y tengo interés en aprender sobre automatización y escalabilidad."
   },
   {
     "id": "tech_stack",
     "intent": "technologies",
     "keywords": ["tecnologias", "stack", "ferramentas", "skills", "technologies", "technical skills", "tecnologías", "habilidades técnicas"],
-    "answer_pt": "Principais tecnologias: Node.js, JavaScript/TypeScript, Kotlin, Spring Boot, JPA, API REST, MySQL, Tailwind/CSS, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); também uso Python em automações e Power BI para dashboards.",
-    "answer_en": "Key technologies: Node.js, JavaScript/TypeScript, Kotlin, Spring Boot, JPA, REST APIs, MySQL, Tailwind/CSS, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); I also use Python for automation and Power BI for dashboards.",
-    "answer_es": "Tecnologías clave: Node.js, JavaScript/TypeScript, Kotlin, Spring Boot, JPA, APIs REST, MySQL, Tailwind/CSS, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); también uso Python para automatizaciones y Power BI para dashboards."
+    "answer_pt": "Já trabalhei com as seguintes tecnologias: Spring Boot, JPA, API REST, MySQL, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); também uso Python em automações e Power BI para dashboards. Atualmente tenho mais afinidade com Node.js, JavaScript/TypeScript, Kotlin e Tailwind/CSS,",
+    "answer_en": "I've worked with the following technologies: Spring Boot, JPA, REST APIs, MySQL, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); I also use Python for automation and Power BI for dashboards. Currently I have more affinity with Node.js, JavaScript/TypeScript, Kotlin and Tailwind/CSS.",
+    "answer_es": "He trabajado con las siguientes tecnologías: Spring Boot, JPA, APIs REST, MySQL, Docker; AWS (S3, EC2, Lambda, SQS, SNS, Athena, Elastic Beanstalk); también uso Python para automatizaciones y Power BI para dashboards. Actualmente tengo más afinidad con Node.js, JavaScript/TypeScript, Kotlin y Tailwind/CSS."
   },
   {
     "id": "current_job",
     "intent": "current_employer",
     "keywords": ["onde trabalha", "empresa atual", "trabalha em", "currently work", "company", "dónde trabajas", "empresa"],
-    "answer_pt": "Atualmente trabalho na Accenture como desenvolvedor backend. (Detalhes operacionais e nomes de clientes não devem ser divulgados.)",
-    "answer_en": "I currently work at Accenture as a backend developer. (Operational details and client names should not be disclosed.)",
-    "answer_es": "Actualmente trabajo en Accenture como desarrollador backend. (No deben divulgarse detalles operativos ni nombres de clientes.)"
+    "answer_pt": "Atualmente trabalho na Accenture como desenvolvedor backend. ",
+    "answer_en": "I currently work at Accenture as a backend developer.",
+    "answer_es": "Actualmente trabajo en Accenture como desarrollador backend."
   },
   {
     "id": "project_tv",
     "intent": "describe_tv_project",
-    "keywords": ["tv", "assinatura", "prime", "subscription", "amazon prime", "tv por suscripción"],
-    "answer_pt": "Desenvolvi o fluxo de assinatura do pacote Amazon Prime usando Node.js e MongoDB, integrei componentes de infraestrutura na AWS (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk) e utilizei Datadog para monitoramento. Participei do ciclo completo: integração, testes e deploy em produção.",
-    "answer_en": "I developed the Amazon Prime subscription flow using Node.js and MongoDB, integrated AWS infrastructure components (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk), and used Datadog for monitoring. I participated across integration, testing and production deployment.",
-    "answer_es": "Desarrollé el flujo de suscripción de Amazon Prime usando Node.js y MongoDB, integré componentes de infraestructura AWS (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk) y usé Datadog para monitorización. Participé en integración, pruebas y despliegue en producción."
+    "keywords": ["tv", "assinatura", "prime", "subscription", "amazon prime", "tv por suscripción", "o que ele já desenvolveu"],
+    "answer_pt": "Desenvolvi o fluxo de assinatura de pacote de assinatura de Streaming usando Node.js e MongoDB, integrei componentes de infraestrutura na AWS (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk) e utilizei Datadog para monitoramento. Participei do ciclo completo: integração, testes e deploy em produção.",
+    "answer_en": "I developed the streaming subscription package flow using Node.js and MongoDB, integrated AWS infrastructure components (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk), and used Datadog for monitoring. I participated in the full cycle: integration, testing, and production deployment.",
+    "answer_es": "Desarrollé el flujo de suscripción de paquete de streaming usando Node.js y MongoDB, integré componentes de infraestructura AWS (EC2, SQS, SNS, Lambda, Athena, S3, Elastic Beanstalk) y usé Datadog para monitoreo. Participé en el ciclo completo: integración, pruebas y despliegue en producción."
   },
   {
     "id": "project_multinational",
     "intent": "describe_multinational_project",
-    "keywords": ["multinacional", "oracle mobile", "sustentação", "multinational", "telecom", "proyecto multinacional"],
+    "keywords": ["multinacional", "oracle mobile", "sustentação", "multinational", "telecom", "proyecto multinacional", "trabalho atual"],
     "answer_pt": "Atuo como backend developer implementando novas features e corrigindo bugs em serviços Node.js; faço manutenção da infraestrutura Oracle Mobile Hub e trabalho com Jira, Confluence, Bitbucket e pipelines de CI/CD para garantir estabilidade e evolução contínua.",
     "answer_en": "I work as a backend developer implementing new features and fixing bugs in Node.js services; I maintain Oracle Mobile Hub infrastructure and use Jira, Confluence, Bitbucket and CI/CD pipelines to ensure stability and ongoing evolution.",
     "answer_es": "Trabajo como backend developer implementando nuevas funcionalidades y corrigiendo bugs en servicios Node.js; mantengo la infraestructura Oracle Mobile Hub y uso Jira, Confluence, Bitbucket y pipelines CI/CD para asegurar estabilidad y evolución continua."
@@ -50,7 +50,7 @@
   {
     "id": "fraud_detection",
     "intent": "fraud_detection_automation",
-    "keywords": ["fraude", "detecção", "automação", "scripts", "fraud detection", "automation", "detección de fraudes"],
+    "keywords": ["fraude", "detecção", "automação", "funcionalidades", "scripts", "fraud detection", "automation", "detección de fraudes"],
     "answer_pt": "Implementei scripts em Python (pandas) que cruzaram dados via APIs (TIM e fornecedores terceirizados) para identificar inconsistências em datas de instalação de fibra. A solução gerou relatórios CSV automatizados e levou à investigação interna sobre discrepâncias entre empresa e terceirizada.",
     "answer_en": "I implemented Python (pandas) scripts that cross-checked data via APIs (TIM and third-party providers) to identify inconsistencies in fiber installation dates. The solution produced automated CSV reports and led to internal investigation into discrepancies between the company and subcontractors.",
     "answer_es": "Implementé scripts en Python (pandas) que cruzaron datos a través de APIs (TIM y proveedores terceros) para identificar inconsistencias en fechas de instalación de fibra. La solución generó informes CSV automatizados y provocó una investigación interna sobre discrepancias entre la empresa y la subcontrata."
@@ -58,7 +58,7 @@
   {
     "id": "secops_role",
     "intent": "secops_role_details",
-    "keywords": ["secops", "ticket manager", "segurança", "slas", "power bi", "security", "ticket", "gestor"],
+    "keywords": ["secops", "ticket manager", "gestão", "segurança", "slas", "power bi", "security", "ticket", "gestor"],
     "answer_pt": "Na SecOps fui responsável pela gestão e triagem de chamados, garantindo cumprimento de SLAs e atendimento de incidentes críticos. Atuei como tradutor técnico em reuniões internacionais e desenvolvi dashboards em Power BI para análise operacional.",
     "answer_en": "In SecOps I managed and triaged tickets, ensuring SLA compliance and handling critical incidents. I acted as a technical translator in international meetings and developed Power BI dashboards for operational analysis.",
     "answer_es": "En SecOps fui responsable de gestionar y clasificar tickets, asegurando el cumplimiento de SLAs y la atención de incidentes críticos. Actué como traductor técnico en reuniones internacionales y desarrollé dashboards en Power BI para análisis operativo."
@@ -66,7 +66,7 @@
   {
     "id": "work_style",
     "intent": "work_style_and_feedback",
-    "keywords": ["como trabalha", "estilo de trabalho", "feedback", "cnv", "comunicação", "work style", "communication", "estilo de trabajo"],
+    "keywords": ["como trabalha", "estilo de trabalho", "feedback", "work style", "communication", "estilo de trabajo"],
     "answer_pt": "Sou persistente e foco em entregar qualidade; prefiro feedback direto e objetivo (1:1 ou comentários em PR). Em conflitos técnicos aplico inteligência emocional e Comunicação Não-Violenta, buscando mediar e alinhar soluções práticas.",
     "answer_en": "I'm persistent and focused on delivering quality; I prefer direct, objective feedback (1:1 or PR comments). In technical conflicts I use emotional intelligence and Nonviolent Communication, aiming to mediate and align practical solutions.",
     "answer_es": "Soy persistente y me enfoco en entregar calidad; prefiero retroalimentación directa y objetiva (1:1 o comentarios en PR). En conflictos técnicos uso inteligencia emocional y Comunicación No Violenta para mediar y alinear soluciones prácticas."
@@ -91,9 +91,9 @@
     "id": "how_is_working_with_ruy",
     "intent": "how_is_working_with_person",
     "keywords": ["como é trabalhar com", "perfil humano", "personalidade", "colegas", "working with you", "colleagues", "trabajar contigo", "compañeros"],
-    "answer_pt": "Sou colaborativo, comunicativo e persistente: busco resolver antes de pedir ajuda, apresento ideias com clareza e valorizo alinhamentos regulares. Gosto de contribuir tecnicamente e apoiar o time com soluções práticas.",
-    "answer_en": "I'm collaborative, communicative and persistent: I try to resolve issues before asking for help, present ideas clearly and value regular alignments. I like to contribute technically and support the team with practical solutions.",
-    "answer_es": "Soy colaborativo, comunicativo y persistente: intento resolver antes de pedir ayuda, presento ideas con claridad y valoro los alineamientos regulares. Me gusta contribuir técnicamente y apoyar al equipo con soluciones prácticas."
+    "answer_pt": "Sou colaborativo, comunicativo e resiliente: busco resolver antes de pedir ajuda, apresento ideias com clareza e valorizo alinhamentos regulares. Gosto de contribuir tecnicamente e apoiar o time com soluções práticas.",
+    "answer_en": "I'm collaborative, communicative and resilient: I try to resolve issues before asking for help, present ideas clearly and value regular alignments. I like to contribute technically and support the team with practical solutions.",
+    "answer_es": "Soy colaborativo, comunicativo y resiliente: intento resolver antes de pedir ayuda, presento ideas con claridad y valoro los alineamientos regulares. Me gusta contribuir técnicamente y apoyar al equipo con soluciones prácticas."
   },
   {
     "id": "personal_curiosities",
@@ -102,5 +102,29 @@
     "answer_pt": "Gosto de jogar jogos digitais e viajar. Comida preferida: hambúrguer. Prato favorito: Fettuccine ao molho pesto com camarão. Essas informações são curiosidades e devem ser compartilhadas apenas quando apropriado.",
     "answer_en": "I enjoy playing digital games and traveling. Favorite food: hamburger. Favorite dish: Fettuccine with pesto sauce and shrimp. These are curiosities and should be shared only when appropriate.",
     "answer_es": "Me gusta jugar videojuegos y viajar. Comida preferida: hamburguesa. Plato favorito: Fettuccine con salsa pesto y camarones. Estas son curiosidades y deben compartirse solo cuando sea apropiado."
+  },
+  {
+    "id": "proudest_achievement",
+    "intent": "proudest_technical_project",
+    "keywords": ["projeto", "realização", "orgulha", "orgulho", "conquista", "achievement", "proud", "logro", "orgullo"],
+    "answer_pt": "Meu projeto que mais me traz realização é o proprio projeto de portfólio! Nele, pude aplicar diversas tecnologias que tinha vontade de me aprofundar para criar uma aplicação robusta e que ainda me permitisse exercer minhas maiores forças, que são a criatividade e a comunicação. Desta forma, consegui aplicar minhas tecnologia de foco de estudo em um unico projeto e, além disso, o projeto me permitiu aprimorar minhas habilidades em design de APIs e pratica com os serviços aws, resultando em um produto final do qual me orgulho muito.",
+    "answer_en": "The project that brings me the most fulfillment is my portfolio project itself! In it, I was able to apply various technologies I wanted to dive deeper into to create a robust application that still allowed me to exercise my greatest strengths, which are creativity and communication. This way, I managed to apply my core study technologies in a single project and, furthermore, the project allowed me to improve my skills in API design and practice with AWS services, resulting in a final product I'm very proud of.",
+    "answer_es": "¡El proyecto que más me trae realización es el propio proyecto de portafolio! En él, pude aplicar diversas tecnologías que tenía ganas de profundizar para crear una aplicación robusta que aún me permitiera ejercer mis mayores fortalezas, que son la creatividad y la comunicación. De esta forma, logré aplicar mis tecnologías de foco de estudio en un único proyecto y, además, el proyecto me permitió mejorar mis habilidades en diseño de APIs y práctica con los servicios AWS, resultando en un producto final del cual me enorgullezco mucho."
+  },
+  {
+    "id": "future_vision",
+    "intent": "professional_future_vision",
+    "keywords": ["futuro", "próximos anos", "imagina", "planeja", "visão", "future", "next years", "see yourself", "futuro profesional", "próximos años", "te ves"],
+    "answer_pt": "Minha expectativa para o futuro profissional é estar em um cargo de liderança técnica, quero adquirir experiencia e conhecimento para poder ajudar e orientar equipes de desenvolvimento, contribuindo para o crescimento tanto dos projetos quanto dos profissionais ao meu redor.",
+    "answer_en": "My expectation for the professional future is to be in a technical leadership position, I want to gain experience and knowledge to be able to help and guide development teams, contributing to the growth of both projects and the professionals around me.",
+    "answer_es": "Mi expectativa para el futuro profesional es estar en un cargo de liderazgo técnico, quiero adquirir experiencia y conocimiento para poder ayudar y orientar a equipos de desarrollo, contribuyendo al crecimiento tanto de los proyectos como de los profesionales a mi alrededor."
+  },
+  {
+    "id": "motivation",
+    "intent": "what_motivates_in_tech",
+    "keywords": ["motiva", "motivação", "inspira", "paixão", "drives", "motivates", "passion", "motivación", "inspira"],
+    "answer_pt": "O que mais me motiva quanto a tecnologia hoje é a inovação constante, me impressiona a maneira como as possibilidades de diversas vertentes da vida se expandem conforme os avanços da tecnologia, seja em desenvolvimento, saude, alimentação ou qualquer aspecto da vida. O que me motiva é querer fazer parte do processo de mudança da vida das pessoas, e aprender com os desafios e dificuldades no caminho.",
+    "answer_en": "What motivates me most about technology today is constant innovation. I'm impressed by how the possibilities in various aspects of life expand as technology advances, whether in development, health, food, or any aspect of life. What motivates me is wanting to be part of the process of changing people's lives, and learning from the challenges and difficulties along the way.",
+    "answer_es": "Lo que más me motiva sobre la tecnología hoy es la innovación constante. Me impresiona la manera en que las posibilidades de diversas vertientes de la vida se expanden conforme avanzan las tecnologías, ya sea en desarrollo, salud, alimentación o cualquier aspecto de la vida. Lo que me motiva es querer formar parte del proceso de cambio en la vida de las personas, y aprender con los desafíos y dificultades en el camino."
   }
 ]
