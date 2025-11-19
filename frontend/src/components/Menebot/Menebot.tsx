@@ -118,13 +118,16 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   }, []);
 
   const handleClick = () => {
+    console.log('🖱️ CLIQUE DETECTADO! Sleeping:', isSleeping);
     if (isSleeping) {
+      console.log('😴 Menebot estava dormindo, acordando...');
       setIsSleeping(false);
       triggerBlinkAndSqueeze();
       scheduleInactivity();
       return;
     }
     
+    console.log('👆 Clique normal, triggering blink');
     triggerBlinkAndSqueeze();
 
     setIsFlapping(true);
@@ -229,7 +232,7 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
           <img 
             src={isBlinking ? menebotBlinkImage : menebotFrontImage}
             alt="Menebot - Assistente virtual" 
-            className="relative w-full h-full object-contain select-none pointer-events-none"
+            className="relative w-full h-full object-contain select-none"
             style={{ 
               zIndex: 1,
               border: isBlinking ? '3px solid red' : 'none', // Debug visual
