@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-
-// Import das imagens do public usando caminhos absolutos (servidos estaticamente)
-const menebotFrontImage = '/assets/images/menebotFront.png';
-const menebotBlinkImage = '/assets/images/menebotBlink.png';
-const wingLeftSvg = '/assets/icons/menebot-wing-left.svg';
-const wingRightSvg = '/assets/icons/menebot-wing-right.svg';
-const eyeSvg = '/assets/icons/menebot-eye.svg';
-const closedEyeSvg = '/assets/icons/menebot-closed-eye.svg';
+import menebotFrontImage from '/assets/images/menebotFront.png?url';
+import menebotBlinkImage from '/assets/images/menebotBlink.png?url';
+import wingLeftSvg from '/assets/icons/menebot-wing-left.svg?url';
+import wingRightSvg from '/assets/icons/menebot-wing-right.svg?url';
+import eyeSvg from '/assets/icons/menebot-eye.svg?url';
+import closedEyeSvg from '/assets/icons/menebot-closed-eye.svg?url';
 
 interface MenebotProps {
   className?: string;
@@ -37,9 +35,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   };
 
   const triggerBlinkAndSqueeze = () => {
-    console.log('TESTE BLINK');
     setIsBlinking(true);
-    setTimeout(() => setIsBlinking(false), 500); // 500ms bem visível
+    setTimeout(() => setIsBlinking(false), 150);
     triggerSqueeze();
   };
 
@@ -118,16 +115,13 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   }, []);
 
   const handleClick = () => {
-    console.log('🖱️ CLIQUE DETECTADO! Sleeping:', isSleeping);
     if (isSleeping) {
-      console.log('😴 Menebot estava dormindo, acordando...');
       setIsSleeping(false);
       triggerBlinkAndSqueeze();
       scheduleInactivity();
       return;
     }
     
-    console.log('👆 Clique normal, triggering blink');
     triggerBlinkAndSqueeze();
 
     setIsFlapping(true);
@@ -233,11 +227,7 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
             src={isBlinking ? menebotBlinkImage : menebotFrontImage}
             alt="Menebot - Assistente virtual" 
             className="relative w-full h-full object-contain select-none"
-            style={{ 
-              zIndex: 1,
-              border: isBlinking ? '3px solid red' : 'none', // Debug visual
-              opacity: isBlinking ? 0.8 : 1 // Debug visual
-            }}
+            style={{ zIndex: 1 }}
             draggable="false"
           />
 
@@ -278,8 +268,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               alt=""
               className="hidden sm:block md:hidden absolute pointer-events-none select-none transition-transform duration-100 ease-out"
               style={{
-                width: isSleeping ? '58px' : '44px',
-                height: isSleeping ? '78px' : '60px',
+                width: isSleeping ? '50px' : '38px',
+                height: isSleeping ? '70px' : '54px',
                 left: isSleeping ? '24%' : '29%',
                 top: '38%',
                 zIndex: 2,
@@ -293,8 +283,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
               alt=""
               className="hidden sm:block md:hidden absolute pointer-events-none select-none transition-transform duration-100 ease-out"
               style={{
-                width: isSleeping ? '58px' : '44px',
-                height: isSleeping ? '78px' : '60px',
+                width: isSleeping ? '50px' : '38px',
+                height: isSleeping ? '70px' : '54px',
                 right: isSleeping ? '24%' : '29%',
                 top: '38%',
                 zIndex: 2,

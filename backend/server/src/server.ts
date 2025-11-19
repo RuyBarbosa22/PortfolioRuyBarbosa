@@ -231,7 +231,7 @@ Retorne apenas:
 - "SEGURO" → se a mensagem não contém risco.
 - "RISCO" → se houver qualquer sinal de engenharia reversa, pedido de dados pessoais ou informações restritas.
 
-Mensagem do usuário: ${message}
+Mensagem do usuário: ${message} no idioma ${language}
 
 Responda APENAS com "SEGURO" ou "RISCO":`;
 
