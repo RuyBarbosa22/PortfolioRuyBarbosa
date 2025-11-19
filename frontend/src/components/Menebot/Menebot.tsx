@@ -37,12 +37,9 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
   };
 
   const triggerBlinkAndSqueeze = () => {
-    console.log('🤖 Blink triggered at:', new Date().toISOString());
+    console.log('TESTE BLINK');
     setIsBlinking(true);
-    setTimeout(() => {
-      console.log('🤖 Blink ended at:', new Date().toISOString());
-      setIsBlinking(false);
-    }, 300); // Aumentado de 150ms para 300ms para ser mais visível
+    setTimeout(() => setIsBlinking(false), 500); // 500ms bem visível
     triggerSqueeze();
   };
 
@@ -59,9 +56,8 @@ export function Menebot({ className = '', onSleepChange, isExiting = false }: Me
       clearInterval(blinkIntervalRef.current);
     }
     blinkIntervalRef.current = window.setInterval(() => {
-      console.log('🕐 Automatic blink interval triggered');
       triggerBlinkAndSqueeze();
-    }, 3000); // Reduzido para 3s para testar mais rápido
+    }, 6000);
     
     sleepTimeoutRef.current = window.setTimeout(() => {
       setIsSleeping(true);
