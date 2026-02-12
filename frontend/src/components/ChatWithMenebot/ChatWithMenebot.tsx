@@ -194,6 +194,7 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
     tooManyRequests: string;
     welcomeBack: string;
     welcomeBackMessage: string;
+    hostingNotice: string;
   }> = {
     pt: {
       title: 'Fale com o menebot!',
@@ -215,7 +216,8 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       finalizing: 'Finalizando...',
       tooManyRequests: 'Muitas tentativas. Tente novamente em 5 minutos.',
       welcomeBack: 'Bem-vindo de volta!',
-      welcomeBackMessage: 'Você já está autenticado. Vamos conversar?'
+      welcomeBackMessage: 'Você já está autenticado. Vamos conversar?',
+      hostingNotice: 'Anteriormente este site era hospedado na AWS. Como agora está no GitHub Pages, algumas funcionalidades podem não funcionar corretamente.'
     },
     en: {
       title: 'Chat with Menebot!',
@@ -237,7 +239,8 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       finalizing: 'Finalizing...',
       tooManyRequests: 'Too many attempts. Please try again in 5 minutes.',
       welcomeBack: 'Welcome back!',
-      welcomeBackMessage: 'You are already authenticated. Let\'s chat?'
+      welcomeBackMessage: 'You are already authenticated. Let\'s chat?',
+      hostingNotice: 'This site was previously hosted on AWS. Since it is now hosted on GitHub Pages, some features may not work correctly.'
     },
     es: {
       title: '¡Chatea con Menebot!',
@@ -259,7 +262,8 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
       finalizing: 'Finalizando...',
       tooManyRequests: 'Demasiados intentos. Inténtalo de nuevo en 5 minutos.',
       welcomeBack: '¡Bienvenido de vuelta!',
-      welcomeBackMessage: 'Ya estás autenticado. ¿Hablamos?'
+      welcomeBackMessage: 'Ya estás autenticado. ¿Hablamos?',
+      hostingNotice: 'Este sitio antes estaba alojado en AWS. Como ahora está en GitHub Pages, algunas funciones pueden no funcionar correctamente.'
     }
   };
 
@@ -545,6 +549,13 @@ export const ChatWithMenebot: React.FC<ChatWithMenebotProps> = ({ language = 'pt
 
           {/* Contador centralizado (6 dígitos) - mostra abaixo do CTA e centralizado em todas as resoluções */}
           <CounterBanner counterTitle={content.counterTitle} />
+
+          {/* Aviso de hospedagem */}
+          <div className="mt-8 md:mt-10 max-w-[860px] mx-auto rounded-2xl border border-[var(--color-primary)]/35 bg-gradient-to-r from-[var(--color-primary)]/10 to-white/5 px-4 sm:px-6 py-4 sm:py-5">
+            <p className="text-sm sm:text-base md:text-lg text-gray-100 font-['Roboto_Mono',monospace] leading-relaxed text-left sm:text-center">
+              {content.hostingNotice}
+            </p>
+          </div>
         </div>
       </div>
 
